@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Users, MapPin, BookOpen, Clock } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
+import { addAlert } from "@/lib/alerts";
 
 export const Route = createFileRoute("/inicio")({
   head: () => ({ meta: [{ title: "Início — Código Violeta" }] }),
@@ -8,12 +9,18 @@ export const Route = createFileRoute("/inicio")({
 });
 
 function Inicio() {
+  const navigate = useNavigate();
   const tiles = [
     { to: "/contatos", icon: Users, label: "Contatos de\nConfiança" },
     { to: "/localizacao", icon: MapPin, label: "Localização\nem tempo real" },
     { to: "/informacoes", icon: BookOpen, label: "Informações\ne Ajuda" },
     { to: "/historico", icon: Clock, label: "Histórico\nde Alertas" },
   ] as const;
+
+  const handleSos = () => {
+    addAlert();
+    navigate({ to: "/sos" });
+  };
 
   return (
     <PhoneShell title="Início" showMenu showBell>
@@ -25,8 +32,8 @@ function Inicio() {
       </div>
 
       <div className="flex justify-center my-8">
-        <Link
-          to="/sos"
+        <button
+          onClick={handleSos}
           aria-label="Acionar SOS"
           className="relative flex items-center justify-center w-56 h-56 rounded-full bg-sos text-sos-foreground shadow-[0_15px_40px_-10px_oklch(0.62_0.23_12/0.6)] active:scale-95 transition-transform"
         >
@@ -39,7 +46,7 @@ function Inicio() {
               PEDIR AJUDA
             </div>
           </div>
-        </Link>
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

@@ -8,15 +8,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — Código Violeta" }] }),
   component: Configuracoes,
 });
 
-const ICON_OPTIONS = [
-  { id: "violeta", label: "Código Violeta", emoji: "🛡️", bg: "bg-primary" },
+const ICON_OPTIONS: { id: string; label: string; emoji?: string; img?: string; bg: string }[] = [
+  { id: "violeta", label: "Código Violeta", img: logo, bg: "bg-primary-soft" },
   { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
   { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
   { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
@@ -30,17 +34,50 @@ function Configuracoes() {
   const [discreto, setDiscreto] = useState(true);
   const [iconOpen, setIconOpen] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState("violeta");
+  const [pinOpen, setPinOpen] = useState(false);
+  const [hasPin, setHasPin] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinConfirm, setPinConfirm] = useState("");
+  const [pinError, setPinError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("cv:appIcon");
     if (saved) setSelectedIcon(saved);
+    setHasPin(!!localStorage.getItem("cv:pin"));
   }, []);
 
   const pickIcon = (id: string) => {
     setSelectedIcon(id);
     localStorage.setItem("cv:appIcon", id);
     setIconOpen(false);
+  };
+
+  const openPin = () => {
+    setPin("");
+    setPinConfirm("");
+    setPinError("");
+    setPinOpen(true);
+  };
+
+  const savePin = () => {
+    if (!/^\d{4,6}$/.test(pin)) {
+      setPinError("O PIN deve ter de 4 a 6 dígitos.");
+      return;
+    }
+    if (pin !== pinConfirm) {
+      setPinError("Os PINs não coincidem.");
+      return;
+    }
+    localStorage.setItem("cv:pin", pin);
+    setHasPin(true);
+    setPinOpen(false);
+  };
+
+  const removePin = () => {
+    localStorage.removeItem("cv:pin");
+    setHasPin(false);
+    setPinOpen(false);
   };
 
   const currentIcon = ICON_OPTIONS.find((i) => i.id === selectedIcon) ?? ICON_OPTIONS[0];
@@ -74,13 +111,23 @@ function Configuracoes() {
             title="Trocar ícone do app"
             sub={`Atual: ${currentIcon.label}`}
             right={
-              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center text-base`}>
-                {currentIcon.emoji}
+              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center overflow-hidden text-base`}>
+                {currentIcon.img ? (
+                  <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-contain" />
+                ) : (
+                  currentIcon.emoji
+                )}
               </div>
             }
           />
         </button>
-        <Row icon={Lock} title="PIN de segurança" sub="Ativar bloqueio do app" />
+        <button onClick={openPin} className="w-full text-left">
+          <Row
+            icon={Lock}
+            title="PIN de segurança"
+            sub={hasPin ? "PIN ativo — toque para alterar" : "Ativar bloqueio do app"}
+          />
+        </button>
         <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
         <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
       </div>
@@ -108,11 +155,15 @@ function Configuracoes() {
                 className="flex flex-col items-center gap-1.5 group"
               >
                 <div
-                  className={`relative w-14 h-14 rounded-2xl ${opt.bg} flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-105 ${
+                  className={`relative w-14 h-14 rounded-2xl ${opt.bg} flex items-center justify-center overflow-hidden text-2xl shadow-sm transition-transform group-hover:scale-105 ${
                     selectedIcon === opt.id ? "ring-2 ring-primary ring-offset-2" : ""
                   }`}
                 >
-                  {opt.emoji}
+                  {opt.img ? (
+                    <img src={opt.img} alt={opt.label} className="w-full h-full object-contain p-1" />
+                  ) : (
+                    opt.emoji
+                  )}
                   {selectedIcon === opt.id && (
                     <span className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
                       <Check size={12} className="text-primary-foreground" />
@@ -125,6 +176,44 @@ function Configuracoes() {
               </button>
             ))}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={pinOpen} onOpenChange={setPinOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>PIN de segurança</DialogTitle>
+            <DialogDescription>
+              Defina um PIN de 4 a 6 dígitos para bloquear o acesso ao app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <Input
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="Novo PIN"
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+            />
+            <Input
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="Confirmar PIN"
+              value={pinConfirm}
+              onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ""))}
+            />
+            {pinError && <p className="text-xs text-sos">{pinError}</p>}
+          </div>
+          <DialogFooter className="gap-2">
+            {hasPin && (
+              <Button variant="outline" onClick={removePin}>
+                Remover PIN
+              </Button>
+            )}
+            <Button onClick={savePin}>Salvar PIN</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </PhoneShell>
