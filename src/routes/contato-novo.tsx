@@ -3,7 +3,7 @@ import { UserPlus, CheckCircle2, Lock } from "lucide-react";
 import { useState, FormEvent } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
-export const Route = createFileRoute("/contatos/novo")({
+export const Route = createFileRoute("/contato-novo")({
   head: () => ({ meta: [{ title: "Adicionar Contato — Código Violeta" }] }),
   component: NovoContato,
 });
