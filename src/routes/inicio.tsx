@@ -9,12 +9,18 @@ export const Route = createFileRoute("/inicio")({
 });
 
 function Inicio() {
+  const navigate = useNavigate();
   const tiles = [
     { to: "/contatos", icon: Users, label: "Contatos de\nConfiança" },
     { to: "/localizacao", icon: MapPin, label: "Localização\nem tempo real" },
     { to: "/informacoes", icon: BookOpen, label: "Informações\ne Ajuda" },
     { to: "/historico", icon: Clock, label: "Histórico\nde Alertas" },
   ] as const;
+
+  const handleSos = () => {
+    addAlert();
+    navigate({ to: "/sos" });
+  };
 
   return (
     <PhoneShell title="Início" showMenu showBell>
