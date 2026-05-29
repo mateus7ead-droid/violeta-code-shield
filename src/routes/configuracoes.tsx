@@ -141,6 +141,17 @@ function Configuracoes() {
             sub={hasPin ? "PIN ativo — toque para alterar" : "Ativar bloqueio do app"}
           />
         </button>
+        <button onClick={() => setSosOpen(true)} className="w-full text-left">
+          <Row
+            icon={Zap}
+            title="Botão de SOS discreto"
+            sub={
+              sosTrigger === "off"
+                ? "Desativado"
+                : `Ativo: 3x ${TRIGGER_LABEL[sosTrigger]}`
+            }
+          />
+        </button>
         <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
         <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
       </div>
