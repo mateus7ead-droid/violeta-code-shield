@@ -16,9 +16,9 @@ import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as InformacoesRouteImport } from './routes/informacoes'
 import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as ContatosRouteImport } from './routes/contatos'
+import { Route as ContatoNovoRouteImport } from './routes/contato-novo'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ContatosNovoRouteImport } from './routes/contatos.novo'
 
 const SosRoute = SosRouteImport.update({
   id: '/sos',
@@ -55,6 +55,11 @@ const ContatosRoute = ContatosRouteImport.update({
   path: '/contatos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContatoNovoRoute = ContatoNovoRouteImport.update({
+  id: '/contato-novo',
+  path: '/contato-novo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -65,54 +70,50 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContatosNovoRoute = ContatosNovoRouteImport.update({
-  id: '/novo',
-  path: '/novo',
-  getParentRoute: () => ContatosRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
-  '/contatos': typeof ContatosRouteWithChildren
+  '/contato-novo': typeof ContatoNovoRoute
+  '/contatos': typeof ContatosRoute
   '/historico': typeof HistoricoRoute
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
   '/localizacao': typeof LocalizacaoRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
-  '/contatos/novo': typeof ContatosNovoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
-  '/contatos': typeof ContatosRouteWithChildren
+  '/contato-novo': typeof ContatoNovoRoute
+  '/contatos': typeof ContatosRoute
   '/historico': typeof HistoricoRoute
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
   '/localizacao': typeof LocalizacaoRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
-  '/contatos/novo': typeof ContatosNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
-  '/contatos': typeof ContatosRouteWithChildren
+  '/contato-novo': typeof ContatoNovoRoute
+  '/contatos': typeof ContatosRoute
   '/historico': typeof HistoricoRoute
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
   '/localizacao': typeof LocalizacaoRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
-  '/contatos/novo': typeof ContatosNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/configuracoes'
+    | '/contato-novo'
     | '/contatos'
     | '/historico'
     | '/informacoes'
@@ -120,11 +121,11 @@ export interface FileRouteTypes {
     | '/localizacao'
     | '/sobre'
     | '/sos'
-    | '/contatos/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/configuracoes'
+    | '/contato-novo'
     | '/contatos'
     | '/historico'
     | '/informacoes'
@@ -132,11 +133,11 @@ export interface FileRouteTypes {
     | '/localizacao'
     | '/sobre'
     | '/sos'
-    | '/contatos/novo'
   id:
     | '__root__'
     | '/'
     | '/configuracoes'
+    | '/contato-novo'
     | '/contatos'
     | '/historico'
     | '/informacoes'
@@ -144,13 +145,13 @@ export interface FileRouteTypes {
     | '/localizacao'
     | '/sobre'
     | '/sos'
-    | '/contatos/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
-  ContatosRoute: typeof ContatosRouteWithChildren
+  ContatoNovoRoute: typeof ContatoNovoRoute
+  ContatosRoute: typeof ContatosRoute
   HistoricoRoute: typeof HistoricoRoute
   InformacoesRoute: typeof InformacoesRoute
   InicioRoute: typeof InicioRoute
@@ -210,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContatosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contato-novo': {
+      id: '/contato-novo'
+      path: '/contato-novo'
+      fullPath: '/contato-novo'
+      preLoaderRoute: typeof ContatoNovoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configuracoes': {
       id: '/configuracoes'
       path: '/configuracoes'
@@ -224,32 +232,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/contatos/novo': {
-      id: '/contatos/novo'
-      path: '/novo'
-      fullPath: '/contatos/novo'
-      preLoaderRoute: typeof ContatosNovoRouteImport
-      parentRoute: typeof ContatosRoute
-    }
   }
 }
-
-interface ContatosRouteChildren {
-  ContatosNovoRoute: typeof ContatosNovoRoute
-}
-
-const ContatosRouteChildren: ContatosRouteChildren = {
-  ContatosNovoRoute: ContatosNovoRoute,
-}
-
-const ContatosRouteWithChildren = ContatosRoute._addFileChildren(
-  ContatosRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
-  ContatosRoute: ContatosRouteWithChildren,
+  ContatoNovoRoute: ContatoNovoRoute,
+  ContatosRoute: ContatosRoute,
   HistoricoRoute: HistoricoRoute,
   InformacoesRoute: InformacoesRoute,
   InicioRoute: InicioRoute,
@@ -260,3 +250,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
