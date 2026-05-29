@@ -8,7 +8,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — Código Violeta" }] }),
@@ -16,7 +20,15 @@ export const Route = createFileRoute("/configuracoes")({
 });
 
 const ICON_OPTIONS = [
-  { id: "violeta", label: "Código Violeta", emoji: "🛡️", bg: "bg-primary" },
+  { id: "violeta", label: "Código Violeta", img: logo, bg: "bg-primary-soft" },
+  { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
+  { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
+  { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
+  { id: "relogio", label: "Relógio", emoji: "⏰", bg: "bg-zinc-800" },
+  { id: "musica", label: "Música", emoji: "🎵", bg: "bg-pink-500" },
+  { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
+  { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
+] as { id: string; label: string; emoji?: string; img?: string; bg: string }[];
   { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
   { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
   { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
