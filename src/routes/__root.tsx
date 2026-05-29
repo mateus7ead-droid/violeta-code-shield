@@ -128,7 +128,6 @@ function DiscreetSosListener() {
   useEffect(() => {
     const STORAGE_KEY = "cv:sosTrigger";
     const keyMap = {
-      power: ["Power"],
       volup: ["AudioVolumeUp", "VolumeUp"],
       voldown: ["AudioVolumeDown", "VolumeDown"],
     } as const;
