@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { UserPlus, CheckCircle2, Lock } from "lucide-react";
+import { UserPlus, CheckCircle2, Lock, BookUser } from "lucide-react";
 import { useState, FormEvent } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
@@ -26,6 +26,34 @@ function NovoContato() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("(79) ");
+  const [pickerMsg, setPickerMsg] = useState<string | null>(null);
+
+  const pickFromContacts = async () => {
+    setPickerMsg(null);
+    const nav = navigator as Navigator & {
+      contacts?: {
+        select: (
+          props: string[],
+          opts?: { multiple?: boolean }
+        ) => Promise<Array<{ name?: string[]; tel?: string[] }>>;
+      };
+    };
+    if (!nav.contacts?.select) {
+      setPickerMsg("Seu dispositivo/navegador não permite acessar a agenda. Disponível em celulares Android com Chrome.");
+      return;
+    }
+    try {
+      const result = await nav.contacts.select(["name", "tel"], { multiple: false });
+      const c = result?.[0];
+      if (!c) return;
+      const n = c.name?.[0] ?? "";
+      const t = c.tel?.[0] ?? "";
+      if (n) setName(n);
+      if (t) setPhone(formatPhone(t));
+    } catch {
+      setPickerMsg("Não foi possível acessar a agenda.");
+    }
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -49,6 +77,15 @@ function NovoContato() {
           <UserPlus className="text-primary-foreground" size={36} />
         </div>
       </div>
+      <button
+        type="button"
+        onClick={pickFromContacts}
+        className="w-full h-12 mb-4 rounded-xl bg-primary-soft border border-primary/30 text-primary font-semibold flex items-center justify-center gap-2 hover:bg-primary/10 transition-colors"
+      >
+        <BookUser size={20} />
+        Escolher da agenda de contatos
+      </button>
+      {pickerMsg && <p className="text-xs text-muted-foreground -mt-2 mb-3 text-center">{pickerMsg}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
