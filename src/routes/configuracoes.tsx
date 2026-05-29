@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check } from "lucide-react";
+import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 import {
@@ -10,8 +10,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/configuracoes")({
@@ -41,13 +43,22 @@ function Configuracoes() {
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [pinError, setPinError] = useState("");
+  const [sosOpen, setSosOpen] = useState(false);
+  const [sosTrigger, setSosTrigger] = useState<SosTrigger>("off");
   const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("cv:appIcon");
     if (saved) setSelectedIcon(saved);
     setHasPin(!!localStorage.getItem("cv:pin"));
+    const t = (localStorage.getItem(SOS_TRIGGER_KEY) as SosTrigger) || "off";
+    setSosTrigger(t);
   }, []);
+
+  const saveSosTrigger = (t: SosTrigger) => {
+    setSosTrigger(t);
+    localStorage.setItem(SOS_TRIGGER_KEY, t);
+  };
 
   const pickIcon = (id: string) => {
     setSelectedIcon(id);
@@ -128,6 +139,17 @@ function Configuracoes() {
             icon={Lock}
             title="PIN de segurança"
             sub={hasPin ? "PIN ativo — toque para alterar" : "Ativar bloqueio do app"}
+          />
+        </button>
+        <button onClick={() => setSosOpen(true)} className="w-full text-left">
+          <Row
+            icon={Zap}
+            title="Botão de SOS discreto"
+            sub={
+              sosTrigger === "off"
+                ? "Desativado"
+                : `Ativo: 3x ${TRIGGER_LABEL[sosTrigger]}`
+            }
           />
         </button>
         <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
@@ -218,9 +240,52 @@ function Configuracoes() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={sosOpen} onOpenChange={setSosOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Botão de SOS discreto</DialogTitle>
+            <DialogDescription>
+              Aperte 3 vezes seguidas o botão escolhido para acionar o alerta sem precisar abrir o app.
+            </DialogDescription>
+          </DialogHeader>
+          <RadioGroup
+            value={sosTrigger}
+            onValueChange={(v) => saveSosTrigger(v as SosTrigger)}
+            className="pt-2"
+          >
+            {([
+              ["off", "Desativado"],
+              ["power", "Botão Ligar/Desligar"],
+              ["volup", "Botão Volume +"],
+              ["voldown", "Botão Volume −"],
+            ] as const).map(([val, label]) => (
+              <label
+                key={val}
+                className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-primary-soft"
+              >
+                <RadioGroupItem value={val} id={`sos-${val}`} />
+                <span className="text-sm font-medium text-foreground">{label}</span>
+              </label>
+            ))}
+          </RadioGroup>
+          <p className="text-xs text-muted-foreground">
+            Observação: o botão Ligar/Desligar pode ser bloqueado pelo sistema do celular. Se não funcionar, escolha Volume + ou Volume −.
+          </p>
+          <DialogFooter>
+            <Button onClick={() => setSosOpen(false)}>Concluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PhoneShell>
   );
 }
+
+const TRIGGER_LABEL: Record<Exclude<SosTrigger, "off">, string> = {
+  power: "Ligar/Desligar",
+  volup: "Volume +",
+  voldown: "Volume −",
+};
 
 function Row({
   icon: Icon,
