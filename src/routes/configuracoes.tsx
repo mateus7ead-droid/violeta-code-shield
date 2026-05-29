@@ -19,7 +19,9 @@ export const Route = createFileRoute("/configuracoes")({
   component: Configuracoes,
 });
 
-const ICON_OPTIONS: { id: string; label: string; emoji?: string; img?: string; bg: string }[] = [
+type IconOption = { id: string; label: string; emoji?: string; img?: string; bg: string };
+
+const ICON_OPTIONS: IconOption[] = [
   { id: "violeta", label: "Código Violeta", img: logo, bg: "bg-primary-soft" },
   { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
   { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
