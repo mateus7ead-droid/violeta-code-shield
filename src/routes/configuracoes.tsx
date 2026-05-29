@@ -29,14 +29,6 @@ const ICON_OPTIONS: { id: string; label: string; emoji?: string; img?: string; b
   { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
   { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
 ];
-  { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
-  { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
-  { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
-  { id: "relogio", label: "Relógio", emoji: "⏰", bg: "bg-zinc-800" },
-  { id: "musica", label: "Música", emoji: "🎵", bg: "bg-pink-500" },
-  { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
-  { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
-];
 
 function Configuracoes() {
   const [discreto, setDiscreto] = useState(true);
