@@ -43,13 +43,22 @@ function Configuracoes() {
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [pinError, setPinError] = useState("");
+  const [sosOpen, setSosOpen] = useState(false);
+  const [sosTrigger, setSosTrigger] = useState<SosTrigger>("off");
   const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("cv:appIcon");
     if (saved) setSelectedIcon(saved);
     setHasPin(!!localStorage.getItem("cv:pin"));
+    const t = (localStorage.getItem(SOS_TRIGGER_KEY) as SosTrigger) || "off";
+    setSosTrigger(t);
   }, []);
+
+  const saveSosTrigger = (t: SosTrigger) => {
+    setSosTrigger(t);
+    localStorage.setItem(SOS_TRIGGER_KEY, t);
+  };
 
   const pickIcon = (id: string) => {
     setSelectedIcon(id);
