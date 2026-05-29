@@ -71,7 +71,7 @@ function Contatos() {
 
       <div className="flex justify-center mt-5">
         <Link
-          to="/contatos/novo"
+          to="/contato-novo"
           aria-label="Adicionar contato"
           className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
         >
