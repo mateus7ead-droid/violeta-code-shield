@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Phone, MessageCircle, Plus, ShieldCheck } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Phone, MessageCircle, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
 export const Route = createFileRoute("/contatos")({
@@ -7,48 +8,73 @@ export const Route = createFileRoute("/contatos")({
   component: Contatos,
 });
 
-const contatos = [
-  { name: "Mãe", phone: "(11) 99999-1111", initial: "M" },
-  { name: "Melhor amiga", phone: "(11) 98888-2222", initial: "A" },
-  { name: "Irmã", phone: "(11) 97777-3333", initial: "I" },
-  { name: "Primo João", phone: "(11) 96666-4444", initial: "J" },
+type Contato = { name: string; phone: string };
+
+const DEFAULTS: Contato[] = [
+  { name: "Mãe", phone: "(11) 99999-1111" },
+  { name: "Melhor amiga", phone: "(11) 98888-2222" },
+  { name: "Irmã", phone: "(11) 97777-3333" },
+  { name: "Primo João", phone: "(11) 96666-4444" },
 ];
 
 function Contatos() {
+  const [contatos, setContatos] = useState<Contato[]>(DEFAULTS);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("cv:contatos");
+      if (raw) setContatos(JSON.parse(raw));
+    } catch {}
+  }, []);
+
+  const remove = (i: number) => {
+    const next = contatos.filter((_, idx) => idx !== i);
+    setContatos(next);
+    localStorage.setItem("cv:contatos", JSON.stringify(next));
+  };
+
   return (
     <PhoneShell
       title="Contatos de Confiança"
       showBack
       rightSlot={
-        <button aria-label="Adicionar" className="text-primary-foreground">
+        <Link to="/contatos/novo" aria-label="Adicionar" className="text-primary-foreground">
           <Plus size={22} />
-        </button>
+        </Link>
       }
     >
       <p className="text-sm text-foreground/80 mb-4">
         Adicione pessoas de confiança que receberão seu alerta.
       </p>
       <ul className="space-y-3">
-        {contatos.map((c) => (
+        {contatos.map((c, i) => (
           <li
-            key={c.name}
+            key={`${c.name}-${i}`}
             className="bg-card border border-border rounded-xl p-3 flex items-center gap-3 shadow-sm"
           >
             <div className="w-12 h-12 rounded-full bg-primary-soft flex items-center justify-center text-primary font-bold">
-              {c.initial}
+              {c.name.charAt(0).toUpperCase()}
             </div>
-            <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">{c.name}</p>
-              <p className="text-xs text-muted-foreground">{c.phone}</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground text-sm truncate">{c.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{c.phone}</p>
             </div>
-            <button aria-label="Ligar" className="text-primary p-2">
+            <a href={`tel:${c.phone}`} aria-label="Ligar" className="text-primary p-2">
               <Phone size={20} />
-            </button>
-            <button aria-label="Mensagem" className="text-primary p-2">
+            </a>
+            <a href={`sms:${c.phone}`} aria-label="Mensagem" className="text-primary p-2">
               <MessageCircle size={20} />
+            </a>
+            <button aria-label="Remover" onClick={() => remove(i)} className="text-sos p-2">
+              <Trash2 size={18} />
             </button>
           </li>
         ))}
+        {contatos.length === 0 && (
+          <li className="text-center text-sm text-muted-foreground py-8">
+            Nenhum contato. Toque em + para adicionar.
+          </li>
+        )}
       </ul>
       <div className="mt-6 bg-primary-soft border border-primary/20 rounded-xl p-4 flex items-start gap-3">
         <ShieldCheck className="text-primary mt-0.5" size={20} />
