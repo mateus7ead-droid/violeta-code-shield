@@ -34,15 +34,7 @@ function Contatos() {
   };
 
   return (
-    <PhoneShell
-      title="Contatos de Confiança"
-      showBack
-      rightSlot={
-        <Link to="/contatos/novo" aria-label="Adicionar" className="text-primary-foreground">
-          <Plus size={22} />
-        </Link>
-      }
-    >
+    <PhoneShell title="Contatos de Confiança" showBack>
       <p className="text-sm text-foreground/80 mb-4">
         Adicione pessoas de confiança que receberão seu alerta.
       </p>
@@ -76,6 +68,17 @@ function Contatos() {
           </li>
         )}
       </ul>
+
+      <div className="flex justify-center mt-5">
+        <Link
+          to="/contatos/novo"
+          aria-label="Adicionar contato"
+          className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
+        >
+          <Plus size={30} strokeWidth={2.5} />
+        </Link>
+      </div>
+
       <div className="mt-6 bg-primary-soft border border-primary/20 rounded-xl p-4 flex items-start gap-3">
         <ShieldCheck className="text-primary mt-0.5" size={20} />
         <p className="text-xs text-foreground/80">
