@@ -32,8 +32,8 @@ function Inicio() {
       </div>
 
       <div className="flex justify-center my-8">
-        <Link
-          to="/sos"
+        <button
+          onClick={handleSos}
           aria-label="Acionar SOS"
           className="relative flex items-center justify-center w-56 h-56 rounded-full bg-sos text-sos-foreground shadow-[0_15px_40px_-10px_oklch(0.62_0.23_12/0.6)] active:scale-95 transition-transform"
         >
@@ -46,7 +46,7 @@ function Inicio() {
               PEDIR AJUDA
             </div>
           </div>
-        </Link>
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
