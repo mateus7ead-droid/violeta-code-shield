@@ -240,9 +240,52 @@ function Configuracoes() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={sosOpen} onOpenChange={setSosOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Botão de SOS discreto</DialogTitle>
+            <DialogDescription>
+              Aperte 3 vezes seguidas o botão escolhido para acionar o alerta sem precisar abrir o app.
+            </DialogDescription>
+          </DialogHeader>
+          <RadioGroup
+            value={sosTrigger}
+            onValueChange={(v) => saveSosTrigger(v as SosTrigger)}
+            className="pt-2"
+          >
+            {([
+              ["off", "Desativado"],
+              ["power", "Botão Ligar/Desligar"],
+              ["volup", "Botão Volume +"],
+              ["voldown", "Botão Volume −"],
+            ] as const).map(([val, label]) => (
+              <label
+                key={val}
+                className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-primary-soft"
+              >
+                <RadioGroupItem value={val} id={`sos-${val}`} />
+                <span className="text-sm font-medium text-foreground">{label}</span>
+              </label>
+            ))}
+          </RadioGroup>
+          <p className="text-xs text-muted-foreground">
+            Observação: o botão Ligar/Desligar pode ser bloqueado pelo sistema do celular. Se não funcionar, escolha Volume + ou Volume −.
+          </p>
+          <DialogFooter>
+            <Button onClick={() => setSosOpen(false)}>Concluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PhoneShell>
   );
 }
+
+const TRIGGER_LABEL: Record<Exclude<SosTrigger, "off">, string> = {
+  power: "Ligar/Desligar",
+  volup: "Volume +",
+  voldown: "Volume −",
+};
 
 function Row({
   icon: Icon,
