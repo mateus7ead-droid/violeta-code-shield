@@ -19,7 +19,7 @@ export const Route = createFileRoute("/configuracoes")({
   component: Configuracoes,
 });
 
-const ICON_OPTIONS = [
+const ICON_OPTIONS: { id: string; label: string; emoji?: string; img?: string; bg: string }[] = [
   { id: "violeta", label: "Código Violeta", img: logo, bg: "bg-primary-soft" },
   { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
   { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
@@ -28,7 +28,7 @@ const ICON_OPTIONS = [
   { id: "musica", label: "Música", emoji: "🎵", bg: "bg-pink-500" },
   { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
   { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
-] as { id: string; label: string; emoji?: string; img?: string; bg: string }[];
+];
   { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
   { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
   { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
