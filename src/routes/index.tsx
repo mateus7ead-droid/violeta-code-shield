@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import shield from "@/assets/shield.png";
+import shield from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
