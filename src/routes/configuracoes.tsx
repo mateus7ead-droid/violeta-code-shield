@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap } from "lucide-react";
+import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 import {
@@ -45,6 +45,8 @@ function Configuracoes() {
   const [pinError, setPinError] = useState("");
   const [sosOpen, setSosOpen] = useState(false);
   const [sosTrigger, setSosTrigger] = useState<SosTrigger>("off");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -152,8 +154,12 @@ function Configuracoes() {
             }
           />
         </button>
-        <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
-        <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
+        <button onClick={() => setDeleteOpen(true)} className="w-full text-left">
+          <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
+        </button>
+        <button onClick={() => setAboutOpen(true)} className="w-full text-left">
+          <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
+        </button>
       </div>
 
       <button
@@ -256,7 +262,6 @@ function Configuracoes() {
           >
             {([
               ["off", "Desativado"],
-              ["power", "Botão Ligar/Desligar"],
               ["volup", "Botão Volume +"],
               ["voldown", "Botão Volume −"],
             ] as const).map(([val, label]) => (
@@ -270,10 +275,89 @@ function Configuracoes() {
             ))}
           </RadioGroup>
           <p className="text-xs text-muted-foreground">
-            Observação: o botão Ligar/Desligar pode ser bloqueado pelo sistema do celular. Se não funcionar, escolha Volume + ou Volume −.
+            Use os botões de Volume + ou Volume − do celular. O alerta é enviado automaticamente, sem precisar abrir o app.
           </p>
           <DialogFooter>
             <Button onClick={() => setSosOpen(false)}>Concluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir meus dados</DialogTitle>
+            <DialogDescription>
+              Esta ação remove permanentemente os dados salvos neste aparelho.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 pt-1">
+            <DataDeleteRow
+              label="Contatos de confiança"
+              storageKey="cv:contatos"
+            />
+            <DataDeleteRow
+              label="Histórico de alertas"
+              storageKey="cv:alerts"
+            />
+            <DataDeleteRow
+              label="PIN de segurança"
+              storageKey="cv:pin"
+              onAfter={() => setHasPin(false)}
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteOpen(false)}
+            >
+              Fechar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                localStorage.removeItem("cv:contatos");
+                localStorage.removeItem("cv:alerts");
+                localStorage.removeItem("cv:pin");
+                setHasPin(false);
+                setDeleteOpen(false);
+              }}
+            >
+              Excluir tudo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <img src={logo} alt="Código Violeta" className="w-8 h-8" />
+              Código Violeta
+            </DialogTitle>
+            <DialogDescription>Versão 1.0.0</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm text-foreground/85">
+            <p>
+              O <strong>Código Violeta</strong> é um aplicativo de proteção pessoal voltado a mulheres em situação de risco de violência doméstica.
+            </p>
+            <p>
+              Com um único toque — ou pelo botão de SOS discreto — o app envia um alerta com a sua localização aos seus contatos de confiança.
+            </p>
+            <ul className="list-disc pl-5 space-y-1 text-foreground/80">
+              <li>Botão SOS rápido e discreto</li>
+              <li>Compartilhamento de localização em tempo real</li>
+              <li>Histórico de alertas enviados</li>
+              <li>PIN de segurança e ícone disfarçado</li>
+            </ul>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
+              <ShieldCheck size={14} className="text-primary" />
+              Seus dados ficam apenas no seu aparelho.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setAboutOpen(false)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -282,10 +366,35 @@ function Configuracoes() {
 }
 
 const TRIGGER_LABEL: Record<Exclude<SosTrigger, "off">, string> = {
-  power: "Ligar/Desligar",
   volup: "Volume +",
   voldown: "Volume −",
 };
+
+function DataDeleteRow({
+  label,
+  storageKey,
+  onAfter,
+}: {
+  label: string;
+  storageKey: string;
+  onAfter?: () => void;
+}) {
+  const handle = () => {
+    localStorage.removeItem(storageKey);
+    onAfter?.();
+  };
+  return (
+    <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+      <span className="text-sm text-foreground">{label}</span>
+      <button
+        onClick={handle}
+        className="text-xs text-sos font-semibold hover:underline"
+      >
+        Excluir
+      </button>
+    </div>
+  );
+}
 
 function Row({
   icon: Icon,
