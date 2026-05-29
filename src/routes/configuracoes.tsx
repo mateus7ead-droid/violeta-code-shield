@@ -34,17 +34,50 @@ function Configuracoes() {
   const [discreto, setDiscreto] = useState(true);
   const [iconOpen, setIconOpen] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState("violeta");
+  const [pinOpen, setPinOpen] = useState(false);
+  const [hasPin, setHasPin] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinConfirm, setPinConfirm] = useState("");
+  const [pinError, setPinError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("cv:appIcon");
     if (saved) setSelectedIcon(saved);
+    setHasPin(!!localStorage.getItem("cv:pin"));
   }, []);
 
   const pickIcon = (id: string) => {
     setSelectedIcon(id);
     localStorage.setItem("cv:appIcon", id);
     setIconOpen(false);
+  };
+
+  const openPin = () => {
+    setPin("");
+    setPinConfirm("");
+    setPinError("");
+    setPinOpen(true);
+  };
+
+  const savePin = () => {
+    if (!/^\d{4,6}$/.test(pin)) {
+      setPinError("O PIN deve ter de 4 a 6 dígitos.");
+      return;
+    }
+    if (pin !== pinConfirm) {
+      setPinError("Os PINs não coincidem.");
+      return;
+    }
+    localStorage.setItem("cv:pin", pin);
+    setHasPin(true);
+    setPinOpen(false);
+  };
+
+  const removePin = () => {
+    localStorage.removeItem("cv:pin");
+    setHasPin(false);
+    setPinOpen(false);
   };
 
   const currentIcon = ICON_OPTIONS.find((i) => i.id === selectedIcon) ?? ICON_OPTIONS[0];
