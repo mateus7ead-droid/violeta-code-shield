@@ -111,13 +111,23 @@ function Configuracoes() {
             title="Trocar ícone do app"
             sub={`Atual: ${currentIcon.label}`}
             right={
-              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center text-base`}>
-                {currentIcon.emoji}
+              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center overflow-hidden text-base`}>
+                {currentIcon.img ? (
+                  <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-contain" />
+                ) : (
+                  currentIcon.emoji
+                )}
               </div>
             }
           />
         </button>
-        <Row icon={Lock} title="PIN de segurança" sub="Ativar bloqueio do app" />
+        <button onClick={openPin} className="w-full text-left">
+          <Row
+            icon={Lock}
+            title="PIN de segurança"
+            sub={hasPin ? "PIN ativo — toque para alterar" : "Ativar bloqueio do app"}
+          />
+        </button>
         <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
         <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
       </div>
