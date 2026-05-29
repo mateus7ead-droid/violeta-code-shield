@@ -11,10 +11,10 @@ export const Route = createFileRoute("/contatos")({
 type Contato = { name: string; phone: string };
 
 const DEFAULTS: Contato[] = [
-  { name: "Mãe", phone: "(11) 99999-1111" },
-  { name: "Melhor amiga", phone: "(11) 98888-2222" },
-  { name: "Irmã", phone: "(11) 97777-3333" },
-  { name: "Primo João", phone: "(11) 96666-4444" },
+  { name: "Mãe", phone: "(79) 99999-1111" },
+  { name: "Melhor amiga", phone: "(79) 98888-2222" },
+  { name: "Irmã", phone: "(79) 97777-3333" },
+  { name: "Primo João", phone: "(79) 96666-4444" },
 ];
 
 function Contatos() {

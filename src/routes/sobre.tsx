@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shield, MapPin, Users, BookOpen } from "lucide-react";
-import shield from "@/assets/shield.png";
+import shield from "@/assets/logo.png";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
