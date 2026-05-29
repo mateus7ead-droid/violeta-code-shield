@@ -178,6 +178,44 @@ function Configuracoes() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={pinOpen} onOpenChange={setPinOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>PIN de segurança</DialogTitle>
+            <DialogDescription>
+              Defina um PIN de 4 a 6 dígitos para bloquear o acesso ao app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <Input
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="Novo PIN"
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+            />
+            <Input
+              type="password"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="Confirmar PIN"
+              value={pinConfirm}
+              onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, ""))}
+            />
+            {pinError && <p className="text-xs text-sos">{pinError}</p>}
+          </div>
+          <DialogFooter className="gap-2">
+            {hasPin && (
+              <Button variant="outline" onClick={removePin}>
+                Remover PIN
+              </Button>
+            )}
+            <Button onClick={savePin}>Salvar PIN</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PhoneShell>
   );
 }
