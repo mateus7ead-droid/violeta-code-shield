@@ -1,16 +1,49 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check } from "lucide-react";
+import { useState, useEffect } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — Código Violeta" }] }),
   component: Configuracoes,
 });
 
+const ICON_OPTIONS = [
+  { id: "violeta", label: "Código Violeta", emoji: "🛡️", bg: "bg-primary" },
+  { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
+  { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
+  { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
+  { id: "relogio", label: "Relógio", emoji: "⏰", bg: "bg-zinc-800" },
+  { id: "musica", label: "Música", emoji: "🎵", bg: "bg-pink-500" },
+  { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
+  { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
+];
+
 function Configuracoes() {
   const [discreto, setDiscreto] = useState(true);
+  const [iconOpen, setIconOpen] = useState(false);
+  const [selectedIcon, setSelectedIcon] = useState("violeta");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const saved = localStorage.getItem("cv:appIcon");
+    if (saved) setSelectedIcon(saved);
+  }, []);
+
+  const pickIcon = (id: string) => {
+    setSelectedIcon(id);
+    localStorage.setItem("cv:appIcon", id);
+    setIconOpen(false);
+  };
+
+  const currentIcon = ICON_OPTIONS.find((i) => i.id === selectedIcon) ?? ICON_OPTIONS[0];
 
   return (
     <PhoneShell title="Configurações" showBack>
@@ -35,7 +68,18 @@ function Configuracoes() {
             </button>
           }
         />
-        <Row icon={ImageIcon} title="Trocar ícone do app" sub="Ícone discreto" />
+        <button onClick={() => setIconOpen(true)} className="w-full text-left">
+          <Row
+            icon={ImageIcon}
+            title="Trocar ícone do app"
+            sub={`Atual: ${currentIcon.label}`}
+            right={
+              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center text-base`}>
+                {currentIcon.emoji}
+              </div>
+            }
+          />
+        </button>
         <Row icon={Lock} title="PIN de segurança" sub="Ativar bloqueio do app" />
         <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
         <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
@@ -47,6 +91,42 @@ function Configuracoes() {
       >
         SAIR DO APP
       </button>
+
+      <Dialog open={iconOpen} onOpenChange={setIconOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Escolher ícone do app</DialogTitle>
+            <DialogDescription>
+              Selecione um ícone discreto para disfarçar o app na sua tela inicial.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-4 gap-3 pt-2">
+            {ICON_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => pickIcon(opt.id)}
+                className="flex flex-col items-center gap-1.5 group"
+              >
+                <div
+                  className={`relative w-14 h-14 rounded-2xl ${opt.bg} flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-105 ${
+                    selectedIcon === opt.id ? "ring-2 ring-primary ring-offset-2" : ""
+                  }`}
+                >
+                  {opt.emoji}
+                  {selectedIcon === opt.id && (
+                    <span className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
+                      <Check size={12} className="text-primary-foreground" />
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] text-center text-foreground/80 leading-tight">
+                  {opt.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </PhoneShell>
   );
 }
