@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check } from "lucide-react";
+import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 import {
@@ -10,8 +10,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/configuracoes")({
