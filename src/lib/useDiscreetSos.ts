@@ -2,12 +2,11 @@ import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { addAlert } from "./alerts";
 
-export type SosTrigger = "off" | "power" | "volup" | "voldown";
+export type SosTrigger = "off" | "volup" | "voldown";
 
 export const SOS_TRIGGER_KEY = "cv:sosTrigger";
 
 const KEY_MAP: Record<Exclude<SosTrigger, "off">, string[]> = {
-  power: ["Power"],
   volup: ["AudioVolumeUp", "VolumeUp"],
   voldown: ["AudioVolumeDown", "VolumeDown"],
 };
