@@ -1,15 +1,17 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { useDiscreetSos } from "@/lib/useDiscreetSos";
+import { addAlert } from "@/lib/alerts";
 
 function NotFoundComponent() {
   return (
@@ -121,6 +123,40 @@ function RootComponent() {
 }
 
 function DiscreetSosListener() {
-  useDiscreetSos();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const STORAGE_KEY = "cv:sosTrigger";
+    const keyMap = {
+      power: ["Power"],
+      volup: ["AudioVolumeUp", "VolumeUp"],
+      voldown: ["AudioVolumeDown", "VolumeDown"],
+    } as const;
+
+    let presses: number[] = [];
+
+    const onKey = (event: KeyboardEvent) => {
+      const trigger = localStorage.getItem(STORAGE_KEY) as keyof typeof keyMap | "off" | null;
+      if (!trigger || trigger === "off") return;
+
+      const validKeys = keyMap[trigger];
+      if (!validKeys?.includes(event.key as never)) return;
+
+      event.preventDefault();
+      const now = Date.now();
+      presses = presses.filter((time) => now - time < 2000);
+      presses.push(now);
+
+      if (presses.length >= 3) {
+        presses = [];
+        addAlert();
+        navigate({ to: "/sos" });
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [navigate]);
+
   return null;
 }
