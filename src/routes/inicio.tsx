@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Users, MapPin, BookOpen, Clock } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
-import { addAlert } from "@/lib/alerts";
+
 
 export const Route = createFileRoute("/inicio")({
   head: () => ({ meta: [{ title: "Início — Código Violeta" }] }),
