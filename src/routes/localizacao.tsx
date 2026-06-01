@@ -45,6 +45,34 @@ function Localizacao() {
     );
   };
 
+  const watchId = useRef<number | null>(null);
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setStatus("Geolocalização não suportada neste dispositivo.");
+      return;
+    }
+    setLoading(true);
+    watchId.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        setCoords({
+          lat: Number(pos.coords.latitude.toFixed(4)),
+          lon: Number(pos.coords.longitude.toFixed(4)),
+          label: "Sua localização atual (em tempo real)",
+        });
+        setLoading(false);
+        setStatus(null);
+      },
+      (err) => {
+        setStatus(err.message || "Não foi possível obter a localização.");
+        setLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+    return () => {
+      if (watchId.current !== null) navigator.geolocation.clearWatch(watchId.current);
+    };
+  }, []);
+
   const share = async () => {
     const text = `Preciso de ajuda. Minha localização: ${mapsUrl}`;
     try {
