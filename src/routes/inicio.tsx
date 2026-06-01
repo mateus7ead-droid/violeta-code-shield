@@ -18,7 +18,6 @@ function Inicio() {
   ] as const;
 
   const handleSos = () => {
-    addAlert();
     navigate({ to: "/sos" });
   };
 
