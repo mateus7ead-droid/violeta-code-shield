@@ -166,7 +166,7 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Escolher ícone do app</DialogTitle>
             <DialogDescription>
-              Selecione um ícone discreto para disfarçar o app na sua tela inicial.
+              Escolha um disfarce e depois toque em "Adicionar à tela inicial" no navegador — o app será instalado já com o ícone e nome disfarçados.
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-4 gap-3 pt-2">
