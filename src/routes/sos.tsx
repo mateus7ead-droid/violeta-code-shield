@@ -80,7 +80,11 @@ function Sos() {
         const numbers = contatos.map((c) => onlyDigits(c.phone)).filter(Boolean).join(",");
         const smsHref = `sms:${numbers}?&body=${encodeURIComponent(message)}`;
         try {
-          window.location.href = smsHref;
+          // clique programático: abre o app de mensagens SEM sair do Código Violeta
+          const a = document.createElement("a");
+          a.href = smsHref;
+          a.rel = "noopener";
+          a.click();
         } catch {}
       }
       setSteps((s) => [s[0], true, s[2], s[3]]);
