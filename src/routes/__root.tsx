@@ -12,6 +12,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { addAlert } from "@/lib/alerts";
+import { applyAppIcon, getSavedAppIcon } from "@/lib/appIcon";
 
 function NotFoundComponent() {
   return (
@@ -86,6 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
@@ -112,6 +114,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    // Aplica o ícone/disfarce salvo (manifest + favicon) e registra o service worker
+    applyAppIcon(getSavedAppIcon());
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

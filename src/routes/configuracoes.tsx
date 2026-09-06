@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
+import { APP_ICON_KEY, APP_ICONS, applyAppIcon, getSavedAppIcon, type AppIconId } from "@/lib/appIcon";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/configuracoes")({
@@ -21,23 +22,18 @@ export const Route = createFileRoute("/configuracoes")({
   component: Configuracoes,
 });
 
-type IconOption = { id: string; label: string; emoji?: string; img?: string; bg: string };
+type IconOption = { id: AppIconId; label: string; img: string };
 
-const ICON_OPTIONS: IconOption[] = [
-  { id: "violeta", label: "Código Violeta", img: logo, bg: "bg-primary-soft" },
-  { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
-  { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
-  { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
-  { id: "relogio", label: "Relógio", emoji: "⏰", bg: "bg-zinc-800" },
-  { id: "musica", label: "Música", emoji: "🎵", bg: "bg-pink-500" },
-  { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
-  { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
-];
+const ICON_OPTIONS: IconOption[] = (Object.keys(APP_ICONS) as AppIconId[]).map((id) => ({
+  id,
+  label: APP_ICONS[id].label,
+  img: APP_ICONS[id].icon,
+}));
 
 function Configuracoes() {
   const [discreto, setDiscreto] = useState(true);
   const [iconOpen, setIconOpen] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState("violeta");
+  const [selectedIcon, setSelectedIcon] = useState<AppIconId>("violeta");
   const [pinOpen, setPinOpen] = useState(false);
   const [hasPin, setHasPin] = useState(false);
   const [pin, setPin] = useState("");
@@ -50,8 +46,7 @@ function Configuracoes() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = localStorage.getItem("cv:appIcon");
-    if (saved) setSelectedIcon(saved);
+    setSelectedIcon(getSavedAppIcon());
     setHasPin(!!localStorage.getItem("cv:pin"));
     const t = (localStorage.getItem(SOS_TRIGGER_KEY) as SosTrigger) || "off";
     setSosTrigger(t);
@@ -62,9 +57,10 @@ function Configuracoes() {
     localStorage.setItem(SOS_TRIGGER_KEY, t);
   };
 
-  const pickIcon = (id: string) => {
+  const pickIcon = (id: AppIconId) => {
     setSelectedIcon(id);
-    localStorage.setItem("cv:appIcon", id);
+    localStorage.setItem(APP_ICON_KEY, id);
+    applyAppIcon(id);
     setIconOpen(false);
   };
 
@@ -126,12 +122,8 @@ function Configuracoes() {
             title="Trocar ícone do app"
             sub={`Atual: ${currentIcon.label}`}
             right={
-              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center overflow-hidden text-base`}>
-                {currentIcon.img ? (
-                  <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-contain" />
-                ) : (
-                  currentIcon.emoji
-                )}
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-cover" />
               </div>
             }
           />
@@ -174,7 +166,7 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Escolher ícone do app</DialogTitle>
             <DialogDescription>
-              Selecione um ícone discreto para disfarçar o app na sua tela inicial.
+              Escolha um disfarce e depois toque em "Adicionar à tela inicial" no navegador — o app será instalado já com o ícone e nome disfarçados.
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-4 gap-3 pt-2">
@@ -185,15 +177,11 @@ function Configuracoes() {
                 className="flex flex-col items-center gap-1.5 group"
               >
                 <div
-                  className={`relative w-14 h-14 rounded-2xl ${opt.bg} flex items-center justify-center overflow-hidden text-2xl shadow-sm transition-transform group-hover:scale-105 ${
+                  className={`relative w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm transition-transform group-hover:scale-105 ${
                     selectedIcon === opt.id ? "ring-2 ring-primary ring-offset-2" : ""
                   }`}
                 >
-                  {opt.img ? (
-                    <img src={opt.img} alt={opt.label} className="w-full h-full object-contain p-1" />
-                  ) : (
-                    opt.emoji
-                  )}
+                  <img src={opt.img} alt={opt.label} className="w-full h-full object-cover" />
                   {selectedIcon === opt.id && (
                     <span className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
                       <Check size={12} className="text-primary-foreground" />

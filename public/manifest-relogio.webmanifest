@@ -1,0 +1,13 @@
+{
+  "name": "Relógio",
+  "short_name": "Relógio",
+  "start_url": "/inicio",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b1026",
+  "theme_color": "#0b1026",
+  "icons": [
+    { "src": "/icons/relogio-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/relogio.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
