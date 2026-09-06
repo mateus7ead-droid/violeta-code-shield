@@ -46,8 +46,7 @@ function Configuracoes() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = localStorage.getItem("cv:appIcon");
-    if (saved) setSelectedIcon(saved);
+    setSelectedIcon(getSavedAppIcon());
     setHasPin(!!localStorage.getItem("cv:pin"));
     const t = (localStorage.getItem(SOS_TRIGGER_KEY) as SosTrigger) || "off";
     setSosTrigger(t);
@@ -58,9 +57,10 @@ function Configuracoes() {
     localStorage.setItem(SOS_TRIGGER_KEY, t);
   };
 
-  const pickIcon = (id: string) => {
+  const pickIcon = (id: AppIconId) => {
     setSelectedIcon(id);
-    localStorage.setItem("cv:appIcon", id);
+    localStorage.setItem(APP_ICON_KEY, id);
+    applyAppIcon(id);
     setIconOpen(false);
   };
 
@@ -122,12 +122,8 @@ function Configuracoes() {
             title="Trocar ícone do app"
             sub={`Atual: ${currentIcon.label}`}
             right={
-              <div className={`w-8 h-8 rounded-lg ${currentIcon.bg} flex items-center justify-center overflow-hidden text-base`}>
-                {currentIcon.img ? (
-                  <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-contain" />
-                ) : (
-                  currentIcon.emoji
-                )}
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-cover" />
               </div>
             }
           />
