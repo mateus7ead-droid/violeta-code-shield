@@ -177,15 +177,11 @@ function Configuracoes() {
                 className="flex flex-col items-center gap-1.5 group"
               >
                 <div
-                  className={`relative w-14 h-14 rounded-2xl ${opt.bg} flex items-center justify-center overflow-hidden text-2xl shadow-sm transition-transform group-hover:scale-105 ${
+                  className={`relative w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm transition-transform group-hover:scale-105 ${
                     selectedIcon === opt.id ? "ring-2 ring-primary ring-offset-2" : ""
                   }`}
                 >
-                  {opt.img ? (
-                    <img src={opt.img} alt={opt.label} className="w-full h-full object-contain p-1" />
-                  ) : (
-                    opt.emoji
-                  )}
+                  <img src={opt.img} alt={opt.label} className="w-full h-full object-cover" />
                   {selectedIcon === opt.id && (
                     <span className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
                       <Check size={12} className="text-primary-foreground" />
