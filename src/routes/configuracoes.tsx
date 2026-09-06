@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
+import { APP_ICON_KEY, APP_ICONS, applyAppIcon, getSavedAppIcon, type AppIconId } from "@/lib/appIcon";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/configuracoes")({
@@ -21,23 +22,18 @@ export const Route = createFileRoute("/configuracoes")({
   component: Configuracoes,
 });
 
-type IconOption = { id: string; label: string; emoji?: string; img?: string; bg: string };
+type IconOption = { id: AppIconId; label: string; img: string };
 
-const ICON_OPTIONS: IconOption[] = [
-  { id: "violeta", label: "Código Violeta", img: logo, bg: "bg-primary-soft" },
-  { id: "calc", label: "Calculadora", emoji: "🧮", bg: "bg-slate-700" },
-  { id: "notas", label: "Notas", emoji: "📝", bg: "bg-amber-500" },
-  { id: "clima", label: "Clima", emoji: "☀️", bg: "bg-sky-500" },
-  { id: "relogio", label: "Relógio", emoji: "⏰", bg: "bg-zinc-800" },
-  { id: "musica", label: "Música", emoji: "🎵", bg: "bg-pink-500" },
-  { id: "fotos", label: "Fotos", emoji: "🖼️", bg: "bg-emerald-500" },
-  { id: "saude", label: "Saúde", emoji: "❤️", bg: "bg-rose-500" },
-];
+const ICON_OPTIONS: IconOption[] = (Object.keys(APP_ICONS) as AppIconId[]).map((id) => ({
+  id,
+  label: APP_ICONS[id].label,
+  img: APP_ICONS[id].icon,
+}));
 
 function Configuracoes() {
   const [discreto, setDiscreto] = useState(true);
   const [iconOpen, setIconOpen] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState("violeta");
+  const [selectedIcon, setSelectedIcon] = useState<AppIconId>("violeta");
   const [pinOpen, setPinOpen] = useState(false);
   const [hasPin, setHasPin] = useState(false);
   const [pin, setPin] = useState("");
