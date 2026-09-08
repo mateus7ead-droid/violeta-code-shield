@@ -72,24 +72,42 @@ function Sos() {
       );
       setSteps((s) => [true, s[1], s[2], s[3]]);
 
-      const message = `🚨 EMERGÊNCIA — Estou em perigo e preciso de ajuda imediata. Minha localização em tempo real: ${mapsUrl}`;
+      const message = `🚨 EMERGÊNCIA — Código Violeta. Estou em perigo e preciso de ajuda imediata. Esta é minha localização em tempo real: ${mapsUrl}`;
 
-      // 2 e 3. notificar contatos + polícia numa única mensagem (evita conflito de dois envios)
+      // 2 e 3. notificar todos os contatos de confiança + a polícia (190)
+      // numa única mensagem, evitando conflito de duas aberturas simultâneas.
       await new Promise((r) => setTimeout(r, 700));
-      const numbers = [
-        ...contatos.map((c) => onlyDigits(c.phone)).filter(Boolean),
-        POLICE,
-      ].join(",");
-      const smsHref = `sms:${numbers}?&body=${encodeURIComponent(message)}`;
-      try {
-        // clique programático: abre o app de mensagens SEM sair do Código Violeta
+      const contactNumbers = contatos
+        .map((c) => onlyDigits(c.phone))
+        .filter(Boolean);
+      const numbers = [...contactNumbers, POLICE].join(",");
+
+      // Formato do link sms: varia entre iOS e Android.
+      // iOS  usa "sms:numero&body=..."  (sem '?')
+      // Android usa "sms:numero?body=..."
+      const isIOS =
+        typeof navigator !== "undefined" &&
+        /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const bodySep = isIOS ? "&body=" : "?body=";
+      const smsHref = `sms:${numbers}${bodySep}${encodeURIComponent(message)}`;
+
+      const openSms = (href: string) => {
         const a = document.createElement("a");
-        a.href = smsHref;
+        a.href = href;
         a.rel = "noopener";
         document.body.appendChild(a);
         a.click();
         a.remove();
-      } catch {}
+      };
+
+      try {
+        openSms(smsHref);
+      } catch {
+        // fallback: tenta abrir somente para a polícia se a lista conjunta falhar
+        try {
+          openSms(`sms:${POLICE}${bodySep}${encodeURIComponent(message)}`);
+        } catch {}
+      }
       setSteps((s) => [s[0], true, s[2], s[3]]);
       await new Promise((r) => setTimeout(r, 500));
       setSteps((s) => [s[0], s[1], true, s[3]]);
