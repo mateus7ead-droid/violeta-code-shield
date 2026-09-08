@@ -74,31 +74,24 @@ function Sos() {
 
       const message = `🚨 EMERGÊNCIA — Estou em perigo e preciso de ajuda imediata. Minha localização em tempo real: ${mapsUrl}`;
 
-      // 2. notificar contatos via SMS (abre o app de mensagens com destinatários + texto)
+      // 2 e 3. notificar contatos + polícia numa única mensagem (evita conflito de dois envios)
       await new Promise((r) => setTimeout(r, 700));
-      if (contatos.length > 0) {
-        const numbers = contatos.map((c) => onlyDigits(c.phone)).filter(Boolean).join(",");
-        const smsHref = `sms:${numbers}?&body=${encodeURIComponent(message)}`;
-        try {
-          // clique programático: abre o app de mensagens SEM sair do Código Violeta
-          const a = document.createElement("a");
-          a.href = smsHref;
-          a.rel = "noopener";
-          a.click();
-        } catch {}
-      }
-      setSteps((s) => [s[0], true, s[2], s[3]]);
-
-      // 3. notificar polícia
-      await new Promise((r) => setTimeout(r, 700));
-      const policeHref = `sms:${POLICE}?&body=${encodeURIComponent(message)}`;
+      const numbers = [
+        ...contatos.map((c) => onlyDigits(c.phone)).filter(Boolean),
+        POLICE,
+      ].join(",");
+      const smsHref = `sms:${numbers}?&body=${encodeURIComponent(message)}`;
       try {
-        // não substitui a localização se já foi aberto; deixamos como link clicável também
+        // clique programático: abre o app de mensagens SEM sair do Código Violeta
         const a = document.createElement("a");
-        a.href = policeHref;
+        a.href = smsHref;
         a.rel = "noopener";
+        document.body.appendChild(a);
         a.click();
+        a.remove();
       } catch {}
+      setSteps((s) => [s[0], true, s[2], s[3]]);
+      await new Promise((r) => setTimeout(r, 500));
       setSteps((s) => [s[0], s[1], true, s[3]]);
 
       // 4. registrar no histórico

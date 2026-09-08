@@ -158,7 +158,6 @@ function DiscreetSosListener() {
 
       if (presses.length >= 3) {
         presses = [];
-        addAlert();
         navigate({ to: "/sos" });
       }
     };
