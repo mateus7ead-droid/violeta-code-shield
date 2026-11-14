@@ -54,7 +54,9 @@ function Inicio() {
           <Link
             key={to}
             to={to}
-            className="bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 shadow-sm hover:bg-primary-soft transition-colors min-h-24"
+            className={`bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center gap-2 shadow-sm hover:bg-primary-soft transition-colors min-h-24 ${
+              to === "/diario" ? "col-span-2" : ""
+            }`}
           >
             <Icon className="text-primary" size={26} />
             <span className="text-xs font-semibold text-center text-foreground whitespace-pre-line leading-tight">
