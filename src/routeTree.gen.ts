@@ -15,6 +15,7 @@ import { Route as LocalizacaoRouteImport } from './routes/localizacao'
 import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as InformacoesRouteImport } from './routes/informacoes'
 import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as DiarioRouteImport } from './routes/diario'
 import { Route as ContatosRouteImport } from './routes/contatos'
 import { Route as ContatoNovoRouteImport } from './routes/contato-novo'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
@@ -50,6 +51,11 @@ const HistoricoRoute = HistoricoRouteImport.update({
   path: '/historico',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiarioRoute = DiarioRouteImport.update({
+  id: '/diario',
+  path: '/diario',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContatosRoute = ContatosRouteImport.update({
   id: '/contatos',
   path: '/contatos',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof ConfiguracoesRoute
   '/contato-novo': typeof ContatoNovoRoute
   '/contatos': typeof ContatosRoute
+  '/diario': typeof DiarioRoute
   '/historico': typeof HistoricoRoute
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof ConfiguracoesRoute
   '/contato-novo': typeof ContatoNovoRoute
   '/contatos': typeof ContatosRoute
+  '/diario': typeof DiarioRoute
   '/historico': typeof HistoricoRoute
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/configuracoes': typeof ConfiguracoesRoute
   '/contato-novo': typeof ContatoNovoRoute
   '/contatos': typeof ContatosRoute
+  '/diario': typeof DiarioRoute
   '/historico': typeof HistoricoRoute
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/contato-novo'
     | '/contatos'
+    | '/diario'
     | '/historico'
     | '/informacoes'
     | '/inicio'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/contato-novo'
     | '/contatos'
+    | '/diario'
     | '/historico'
     | '/informacoes'
     | '/inicio'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/contato-novo'
     | '/contatos'
+    | '/diario'
     | '/historico'
     | '/informacoes'
     | '/inicio'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   ContatoNovoRoute: typeof ContatoNovoRoute
   ContatosRoute: typeof ContatosRoute
+  DiarioRoute: typeof DiarioRoute
   HistoricoRoute: typeof HistoricoRoute
   InformacoesRoute: typeof InformacoesRoute
   InicioRoute: typeof InicioRoute
@@ -204,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoricoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/diario': {
+      id: '/diario'
+      path: '/diario'
+      fullPath: '/diario'
+      preLoaderRoute: typeof DiarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contatos': {
       id: '/contatos'
       path: '/contatos'
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfiguracoesRoute: ConfiguracoesRoute,
   ContatoNovoRoute: ContatoNovoRoute,
   ContatosRoute: ContatosRoute,
+  DiarioRoute: DiarioRoute,
   HistoricoRoute: HistoricoRoute,
   InformacoesRoute: InformacoesRoute,
   InicioRoute: InicioRoute,

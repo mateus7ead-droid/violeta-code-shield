@@ -15,6 +15,7 @@ function Inicio() {
     { to: "/localizacao", icon: MapPin, label: "Localização\nem tempo real" },
     { to: "/informacoes", icon: BookOpen, label: "Informações\ne Ajuda" },
     { to: "/historico", icon: Clock, label: "Histórico\nde Alertas" },
+    { to: "/diario", icon: BookHeart, label: "Meu Diário\nde Desabafo" },
   ] as const;
 
   const handleSos = () => {
