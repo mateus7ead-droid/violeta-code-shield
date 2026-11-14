@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794617655503,
+      "tag": "0000_create_violeta_conversations",
+      "breakpoints": true
+    }
+  ]
 }
