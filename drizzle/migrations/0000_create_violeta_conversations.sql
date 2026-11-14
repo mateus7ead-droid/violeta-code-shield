@@ -1,0 +1,16 @@
+CREATE TABLE public.ai_threads (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, title text NOT NULL DEFAULT 'Nova conversa', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ai_threads TO authenticated;
+GRANT ALL ON public.ai_threads TO service_role;
+ALTER TABLE public.ai_threads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY threads_owner ON public.ai_threads FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE TABLE public.ai_messages (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), thread_id uuid NOT NULL REFERENCES public.ai_threads(id) ON DELETE CASCADE, user_id uuid NOT NULL, sdk_id text NOT NULL, message jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE(thread_id, sdk_id));
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ai_messages TO authenticated;
+GRANT ALL ON public.ai_messages TO service_role;
+ALTER TABLE public.ai_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY messages_owner ON public.ai_messages FOR ALL TO authenticated USING (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.ai_threads t WHERE t.id = thread_id AND t.user_id = auth.uid())) WITH CHECK (user_id = auth.uid() AND EXISTS (SELECT 1 FROM public.ai_threads t WHERE t.id = thread_id AND t.user_id = auth.uid()));
+CREATE INDEX messages_thread_created ON public.ai_messages(thread_id, created_at);
+CREATE TABLE public.ai_access_state (user_id uuid PRIMARY KEY, reason text NOT NULL, status integer NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.ai_access_state TO authenticated;
+GRANT ALL ON public.ai_access_state TO service_role;
+ALTER TABLE public.ai_access_state ENABLE ROW LEVEL SECURITY;
+CREATE POLICY access_state_owner ON public.ai_access_state FOR SELECT TO authenticated USING(user_id = auth.uid());
