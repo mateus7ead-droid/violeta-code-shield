@@ -18,7 +18,7 @@ export function AssistantChat({ threadId, initialMessages }: { threadId: string;
   const cache = useQueryClient();
   const transport = useMemo(() => new DefaultChatTransport({
     api: "/api/chat", body: { threadId },
-    headers: async () => { const { data } = await supabase.auth.getSession(); return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {}; },
+    headers: async () => { const { data } = await supabase.auth.getSession(); const headers = new Headers(); if (data.session) headers.set("Authorization", `Bearer ${data.session.access_token}`); return headers; },
     fetch: async (url, init) => {
       const response = await fetch(url, init);
       if (!response.ok) {
