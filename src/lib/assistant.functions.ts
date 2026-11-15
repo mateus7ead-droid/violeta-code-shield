@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import type { UIMessage } from "ai";
 
 const threadInput = z.object({ threadId: z.string().uuid() });
 
@@ -26,7 +25,7 @@ export const loadThread = createServerFn({ method: "GET" })
   .handler(async ({ data: input, context }) => {
     const thread = await context.supabase.from("ai_threads").select("id,title").eq("id", input.threadId).eq("user_id", context.userId).single();
     if (thread.error) throw new Error("Conversa não encontrada.");
-    const rows = []; let offset = 0;
+    const rows: { message: unknown }[] = []; let offset = 0;
     while (true) {
       const { data, error } = await context.supabase.from("ai_messages").select("message").eq("thread_id", input.threadId).eq("user_id", context.userId).order("created_at").order("id").range(offset, offset + 499);
       if (error) throw new Error("Não foi possível carregar as mensagens.");
@@ -34,7 +33,7 @@ export const loadThread = createServerFn({ method: "GET" })
       if (data.length < 500) break;
       offset += 500;
     }
-    return { thread: thread.data, messages: rows.map(row => row.message as unknown as UIMessage) };
+    return { thread: thread.data, messagesJson: JSON.stringify(rows.map(row => row.message)) };
   });
 
 export const deleteThread = createServerFn({ method: "POST" })

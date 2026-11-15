@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Users, MapPin, BookOpen, Clock, BookHeart } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
+import { Button } from "@/components/ui/button";
+import { pageHead } from "@/lib/page-head";
+import logo from "@/assets/logo-codigo-violeta.png.asset.json";
 
 
 export const Route = createFileRoute("/inicio")({
-  head: () => ({ meta: [{ title: "Início — Código Violeta" }] }),
+  head: () => pageHead("Início", "Acesse o SOS, seus contatos, diário e a assistente Maria da Penha."),
   component: Inicio,
 });
 
@@ -65,6 +68,14 @@ function Inicio() {
           </Link>
         ))}
       </div>
+      <section className="mt-6 border-t border-border pt-5">
+        <div className="flex items-center gap-3">
+          <img src={logo.url} alt="" className="size-12 object-contain" />
+          <div><h2 className="font-bold text-primary">Maria da Penha</h2><p className="text-xs text-muted-foreground">Assistente de inteligência artificial</p></div>
+        </div>
+        <p className="mt-3 text-sm text-foreground">Um espaço de acolhimento para suas dúvidas sobre violência, direitos e proteção.</p>
+        <Button asChild className="mt-4 w-full"><Link to="/assistente">Conversar com a assistente</Link></Button>
+      </section>
     </PhoneShell>
   );
 }

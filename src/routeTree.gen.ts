@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AssistenteRouteImport } from './routes/assistente'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ContatoNovoRouteImport } from './routes/contato-novo'
 import { Route as ContatosRouteImport } from './routes/contatos'
@@ -21,10 +22,17 @@ import { Route as LocalizacaoRouteImport } from './routes/localizacao'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SosRouteImport } from './routes/sos'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AssistenteIndexRouteImport } from './routes/assistente.index'
+import { Route as AssistenteThreadIdRouteImport } from './routes/assistente.$threadId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistenteRoute = AssistenteRouteImport.update({
+  id: '/assistente',
+  path: '/assistente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
@@ -82,9 +90,20 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AssistenteIndexRoute = AssistenteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AssistenteRoute,
+} as any)
+const AssistenteThreadIdRoute = AssistenteThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => AssistenteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assistente': typeof AssistenteRouteWithChildren
   '/configuracoes': typeof ConfiguracoesRoute
   '/contato-novo': typeof ContatoNovoRoute
   '/contatos': typeof ContatosRoute
@@ -96,6 +115,8 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
   '/api/chat': typeof ApiChatRoute
+  '/assistente/$threadId': typeof AssistenteThreadIdRoute
+  '/assistente/': typeof AssistenteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,10 +131,13 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
   '/api/chat': typeof ApiChatRoute
+  '/assistente/$threadId': typeof AssistenteThreadIdRoute
+  '/assistente': typeof AssistenteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assistente': typeof AssistenteRouteWithChildren
   '/configuracoes': typeof ConfiguracoesRoute
   '/contato-novo': typeof ContatoNovoRoute
   '/contatos': typeof ContatosRoute
@@ -125,11 +149,14 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
   '/api/chat': typeof ApiChatRoute
+  '/assistente/$threadId': typeof AssistenteThreadIdRoute
+  '/assistente/': typeof AssistenteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/assistente'
     | '/configuracoes'
     | '/contato-novo'
     | '/contatos'
@@ -141,6 +168,8 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/sos'
     | '/api/chat'
+    | '/assistente/$threadId'
+    | '/assistente/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,9 +184,12 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/sos'
     | '/api/chat'
+    | '/assistente/$threadId'
+    | '/assistente'
   id:
     | '__root__'
     | '/'
+    | '/assistente'
     | '/configuracoes'
     | '/contato-novo'
     | '/contatos'
@@ -169,10 +201,13 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/sos'
     | '/api/chat'
+    | '/assistente/$threadId'
+    | '/assistente/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssistenteRoute: typeof AssistenteRouteWithChildren
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   ContatoNovoRoute: typeof ContatoNovoRoute
   ContatosRoute: typeof ContatosRoute
@@ -193,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistente': {
+      id: '/assistente'
+      path: '/assistente'
+      fullPath: '/assistente'
+      preLoaderRoute: typeof AssistenteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/configuracoes': {
@@ -272,11 +314,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/assistente/': {
+      id: '/assistente/'
+      path: '/'
+      fullPath: '/assistente/'
+      preLoaderRoute: typeof AssistenteIndexRouteImport
+      parentRoute: typeof AssistenteRoute
+    }
+    '/assistente/$threadId': {
+      id: '/assistente/$threadId'
+      path: '/$threadId'
+      fullPath: '/assistente/$threadId'
+      preLoaderRoute: typeof AssistenteThreadIdRouteImport
+      parentRoute: typeof AssistenteRoute
+    }
   }
 }
 
+interface AssistenteRouteChildren {
+  AssistenteThreadIdRoute: typeof AssistenteThreadIdRoute
+  AssistenteIndexRoute: typeof AssistenteIndexRoute
+}
+
+const AssistenteRouteChildren: AssistenteRouteChildren = {
+  AssistenteThreadIdRoute: AssistenteThreadIdRoute,
+  AssistenteIndexRoute: AssistenteIndexRoute,
+}
+
+const AssistenteRouteWithChildren = AssistenteRoute._addFileChildren(
+  AssistenteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssistenteRoute: AssistenteRouteWithChildren,
   ConfiguracoesRoute: ConfiguracoesRoute,
   ContatoNovoRoute: ContatoNovoRoute,
   ContatosRoute: ContatosRoute,
