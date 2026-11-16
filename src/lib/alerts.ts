@@ -24,8 +24,8 @@ export function addAlert(): AlertEvent {
   const evt: AlertEvent = {
     id: `${now.getTime()}`,
     date,
-    title: "Alerta enviado",
-    sub: "Localização compartilhada",
+    title: "SOS acionado",
+    sub: "Acionamento registrado; envio não confirmado",
     canceled: false,
   };
   const list = [evt, ...getAlerts()];

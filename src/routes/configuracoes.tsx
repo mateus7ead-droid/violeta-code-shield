@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -16,9 +17,11 @@ import { Input } from "@/components/ui/input";
 import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
 import { APP_ICON_KEY, APP_ICONS, applyAppIcon, getSavedAppIcon, type AppIconId } from "@/lib/appIcon";
 import logo from "@/assets/logo.png";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => ({ meta: [{ title: "Configurações — Código Violeta" }] }),
+  head: () => pageHead("Configurações", "Gerencie sua conta, ícone e preferências do Código Violeta."),
   component: Configuracoes,
 });
 
@@ -44,6 +47,7 @@ function Configuracoes() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const navigate = useNavigate();
+  const cache = useQueryClient();
 
   useEffect(() => {
     setSelectedIcon(getSavedAppIcon());
@@ -154,12 +158,7 @@ function Configuracoes() {
         </button>
       </div>
 
-      <button
-        onClick={() => navigate({ to: "/" })}
-        className="mt-10 w-full border-2 border-primary text-primary font-semibold py-3.5 rounded-full"
-      >
-        SAIR DO APP
-      </button>
+      <Button variant="outline" className="mt-10 w-full" onClick={async () => { await cache.cancelQueries(); cache.clear(); const { error } = await supabase.auth.signOut(); if (!error) await navigate({ to: "/", replace: true }); }}>Sair da conta</Button>
 
       <Dialog open={iconOpen} onOpenChange={setIconOpen}>
         <DialogContent className="max-w-sm">
@@ -240,7 +239,7 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Botão de SOS discreto</DialogTitle>
             <DialogDescription>
-              Aperte 3 vezes seguidas o botão escolhido para acionar o alerta sem precisar abrir o app.
+              Aperte 3 vezes seguidas o botão escolhido quando o aplicativo estiver aberto e o navegador permitir detectar esses botões.
             </DialogDescription>
           </DialogHeader>
           <RadioGroup
@@ -263,7 +262,7 @@ function Configuracoes() {
             ))}
           </RadioGroup>
           <p className="text-xs text-muted-foreground">
-            Use os botões de Volume + ou Volume − do celular. O alerta é enviado automaticamente, sem precisar abrir o app.
+            Não funciona com o aplicativo fechado ou a tela bloqueada. O SOS abre as opções de ajuda; mensagens precisam de confirmação.
           </p>
           <DialogFooter>
             <Button onClick={() => setSosOpen(false)}>Concluir</Button>
@@ -341,7 +340,7 @@ function Configuracoes() {
             </ul>
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
               <ShieldCheck size={14} className="text-primary" />
-              Seus dados ficam apenas no seu aparelho.
+              Contatos e diário ficam neste aparelho. Conversas com a assistente ficam na sua conta.
             </div>
           </div>
           <DialogFooter>

@@ -1,10 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { BookHeart, Lock, PenLine, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
 export const Route = createFileRoute("/diario")({
-  head: () => ({ meta: [{ title: "Meu Diário — Código Violeta" }] }),
+  head: () => pageHead("Meu Diário", "Seu espaço de desabafo e registros pessoais no Código Violeta."),
   component: Diario,
 });
 
@@ -141,8 +142,7 @@ function Diario() {
       <div className="mt-6 bg-primary-soft border border-primary/20 rounded-xl p-4 flex items-center gap-3">
         <Lock className="text-primary shrink-0" size={22} />
         <p className="text-xs text-foreground/80">
-          Seus desabafos ficam salvos apenas neste aparelho e ninguém mais tem
-          acesso a eles.
+          Seus desabafos ficam salvos neste aparelho e podem ser vistos por quem tiver acesso a ele.
         </p>
       </div>
     </PhoneShell>

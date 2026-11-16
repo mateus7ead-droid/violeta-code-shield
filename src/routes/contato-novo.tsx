@@ -1,10 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { UserPlus, CheckCircle2, Lock, BookUser } from "lucide-react";
 import { useState, FormEvent } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
 export const Route = createFileRoute("/contato-novo")({
-  head: () => ({ meta: [{ title: "Adicionar Contato — Código Violeta" }] }),
+  head: () => pageHead("Adicionar Contato", "Adicione uma pessoa de confiança pelo nome e telefone."),
   component: NovoContato,
 });
 

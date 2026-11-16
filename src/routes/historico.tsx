@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { Bell, BellOff, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import { PhoneShell } from "@/components/PhoneShell";
 import { AlertEvent, deleteAlert, getAlerts } from "@/lib/alerts";
 
 export const Route = createFileRoute("/historico")({
-  head: () => ({ meta: [{ title: "Histórico de Alertas — Código Violeta" }] }),
+  head: () => pageHead("Histórico de Alertas", "Consulte e exclua os registros de acionamento do SOS."),
   component: Historico,
 });
 

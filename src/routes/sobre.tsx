@@ -1,11 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shield, MapPin, Users, BookOpen } from "lucide-react";
+import { pageHead } from "@/lib/page-head";
 import shield from "@/assets/logo.png";
 
 export const Route = createFileRoute("/sobre")({
-  head: () => ({
-    meta: [{ title: "Sobre — Código Violeta" }],
-  }),
+  head: () => pageHead("Sobre", "Conheça o Código Violeta, um espaço de apoio e informação contra a violência doméstica."),
   component: Sobre,
 });
 
@@ -39,7 +38,7 @@ function Sobre() {
 
       <div className="mt-auto pt-10">
         <Link
-          to="/inicio"
+          to="/"
           className="block w-full text-center bg-primary text-primary-foreground font-semibold py-3 rounded-full mb-6"
         >
           Entrar

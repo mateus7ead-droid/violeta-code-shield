@@ -1,10 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Phone, MessageCircle, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
 export const Route = createFileRoute("/contatos")({
-  head: () => ({ meta: [{ title: "Contatos de Confiança — Código Violeta" }] }),
+  head: () => pageHead("Contatos de Confiança", "Gerencie seus contatos de confiança no Código Violeta."),
   component: Contatos,
 });
 
