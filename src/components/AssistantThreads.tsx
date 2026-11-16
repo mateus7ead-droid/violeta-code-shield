@@ -24,7 +24,7 @@ export function AssistantThreads({ activeId }: { activeId?: string }) {
         try { const thread = await create(); await cache.invalidateQueries({ queryKey: threadsOptions.queryKey }); await navigate({ to: "/assistente/$threadId", params: { threadId: thread.id } }); }
         catch { setError("Não foi possível iniciar uma conversa."); } finally { setBusy(false); }
       }}><Plus size={16} />Nova conversa</Button>
-      <Button variant="ghost" size="icon" title="Sair da conta" aria-label="Sair da conta" onClick={async () => { await supabase.auth.signOut(); cache.removeQueries({ queryKey: threadsOptions.queryKey }); cache.removeQueries({ queryKey: ["assistant-thread"] }); }}><LogOut size={18} /></Button>
+      <Button variant="ghost" size="icon" title="Sair da conta" aria-label="Sair da conta" onClick={async () => { await cache.cancelQueries(); cache.clear(); const { error } = await supabase.auth.signOut(); if (!error) await navigate({ to: "/", replace: true }); }}><LogOut size={18} /></Button>
     </div>
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
     <div className="max-h-40 overflow-y-auto space-y-1">

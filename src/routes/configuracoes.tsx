@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
 import { APP_ICON_KEY, APP_ICONS, applyAppIcon, getSavedAppIcon, type AppIconId } from "@/lib/appIcon";
 import logo from "@/assets/logo.png";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — Código Violeta" }] }),
@@ -44,6 +46,7 @@ function Configuracoes() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const navigate = useNavigate();
+  const cache = useQueryClient();
 
   useEffect(() => {
     setSelectedIcon(getSavedAppIcon());
@@ -154,12 +157,7 @@ function Configuracoes() {
         </button>
       </div>
 
-      <button
-        onClick={() => navigate({ to: "/" })}
-        className="mt-10 w-full border-2 border-primary text-primary font-semibold py-3.5 rounded-full"
-      >
-        SAIR DO APP
-      </button>
+      <Button variant="outline" className="mt-10 w-full" onClick={async () => { await cache.cancelQueries(); cache.clear(); const { error } = await supabase.auth.signOut(); if (!error) await navigate({ to: "/", replace: true }); }}>Sair da conta</Button>
 
       <Dialog open={iconOpen} onOpenChange={setIconOpen}>
         <DialogContent className="max-w-sm">

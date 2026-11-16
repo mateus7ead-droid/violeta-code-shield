@@ -1,4 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { AuthContext } from "@/lib/auth-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -113,6 +116,30 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const [auth, setAuth] = useState<{ session: Session | null; ready: boolean }>({ session: null, ready: false });
+
+  useEffect(() => {
+    let active = true;
+    let revision = 0;
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      revision += 1;
+      if (!active) return;
+      setAuth({ session, ready: true });
+      if (["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event)) {
+        void router.invalidate();
+        if (event !== "SIGNED_OUT") void queryClient.invalidateQueries();
+      }
+    });
+    const initialRevision = revision;
+    void supabase.auth.getUser().then(async ({ data: user, error }) => {
+      if (!active || revision !== initialRevision) return;
+      if (error || !user.user) { setAuth({ session: null, ready: true }); return; }
+      const { data: current } = await supabase.auth.getSession();
+      if (active && revision === initialRevision) setAuth({ session: current.session, ready: true });
+    }).catch(() => { if (active) setAuth({ session: null, ready: true }); });
+    return () => { active = false; data.subscription.unsubscribe(); };
+  }, [queryClient, router]);
 
   useEffect(() => {
     // Ícone instalado sem cache offline ou registro de service worker.
@@ -121,9 +148,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthContext.Provider value={auth}>
       <DiscreetSosListener />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      </AuthContext.Provider>
     </QueryClientProvider>
   );
 }
