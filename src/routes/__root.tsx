@@ -125,6 +125,7 @@ function RootComponent() {
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       revision += 1;
       if (!active) return;
+      if (event === "PASSWORD_RECOVERY") sessionStorage.setItem("cv:passwordRecovery", "true");
       setAuth({ session, ready: true });
       if (["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event)) {
         void router.invalidate();
