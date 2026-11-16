@@ -19,6 +19,7 @@ import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as InformacoesRouteImport } from './routes/informacoes'
 import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as LocalizacaoRouteImport } from './routes/localizacao'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SosRouteImport } from './routes/sos'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -75,6 +76,11 @@ const LocalizacaoRoute = LocalizacaoRouteImport.update({
   path: '/localizacao',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
   '/localizacao': typeof LocalizacaoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
   '/api/chat': typeof ApiChatRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
   '/localizacao': typeof LocalizacaoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
   '/api/chat': typeof ApiChatRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/informacoes': typeof InformacoesRoute
   '/inicio': typeof InicioRoute
   '/localizacao': typeof LocalizacaoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
   '/api/chat': typeof ApiChatRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/inicio'
     | '/localizacao'
+    | '/reset-password'
     | '/sobre'
     | '/sos'
     | '/api/chat'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/inicio'
     | '/localizacao'
+    | '/reset-password'
     | '/sobre'
     | '/sos'
     | '/api/chat'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/informacoes'
     | '/inicio'
     | '/localizacao'
+    | '/reset-password'
     | '/sobre'
     | '/sos'
     | '/api/chat'
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   InformacoesRoute: typeof InformacoesRoute
   InicioRoute: typeof InicioRoute
   LocalizacaoRoute: typeof LocalizacaoRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SobreRoute: typeof SobreRoute
   SosRoute: typeof SosRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocalizacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sobre': {
       id: '/sobre'
       path: '/sobre'
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   InformacoesRoute: InformacoesRoute,
   InicioRoute: InicioRoute,
   LocalizacaoRoute: LocalizacaoRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SobreRoute: SobreRoute,
   SosRoute: SosRoute,
   ApiChatRoute: ApiChatRoute,
