@@ -239,7 +239,7 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Botão de SOS discreto</DialogTitle>
             <DialogDescription>
-              Aperte 3 vezes seguidas o botão escolhido para acionar o alerta sem precisar abrir o app.
+              Aperte 3 vezes seguidas o botão escolhido quando o aplicativo estiver aberto e o navegador permitir detectar esses botões.
             </DialogDescription>
           </DialogHeader>
           <RadioGroup
@@ -262,7 +262,7 @@ function Configuracoes() {
             ))}
           </RadioGroup>
           <p className="text-xs text-muted-foreground">
-            Use os botões de Volume + ou Volume − do celular. O alerta é enviado automaticamente, sem precisar abrir o app.
+            Não funciona com o aplicativo fechado ou a tela bloqueada. O SOS abre as opções de ajuda; mensagens precisam de confirmação.
           </p>
           <DialogFooter>
             <Button onClick={() => setSosOpen(false)}>Concluir</Button>
@@ -340,7 +340,7 @@ function Configuracoes() {
             </ul>
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
               <ShieldCheck size={14} className="text-primary" />
-              Seus dados ficam apenas no seu aparelho.
+              Contatos e diário ficam neste aparelho. Conversas com a assistente ficam na sua conta.
             </div>
           </div>
           <DialogFooter>

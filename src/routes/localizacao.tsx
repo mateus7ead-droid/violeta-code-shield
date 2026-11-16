@@ -99,7 +99,7 @@ function Localizacao() {
           loading="lazy"
         />
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-card shadow-md rounded-lg px-4 py-2 text-xs text-center text-foreground/80 w-64 z-10">
-          Sua localização está sendo compartilhada
+          Sua localização não é enviada automaticamente
         </div>
       </div>
       <div className="bg-card p-5 rounded-t-2xl -mt-4 relative shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.1)] z-10">
