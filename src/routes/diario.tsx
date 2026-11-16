@@ -1,10 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { BookHeart, Lock, PenLine, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
 export const Route = createFileRoute("/diario")({
-  head: () => ({ meta: [{ title: "Meu Diário — Código Violeta" }] }),
+  head: () => pageHead("Meu Diário", "Seu espaço de desabafo e registros pessoais no Código Violeta."),
   component: Diario,
 });
 

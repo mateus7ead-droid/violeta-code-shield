@@ -1,10 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, RefreshCw, Share2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
 export const Route = createFileRoute("/localizacao")({
-  head: () => ({ meta: [{ title: "Localização — Código Violeta" }] }),
+  head: () => pageHead("Localização", "Consulte sua localização e compartilhe um link com pessoas de confiança."),
   component: Localizacao,
 });
 

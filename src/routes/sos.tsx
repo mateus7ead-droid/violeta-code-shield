@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BellOff, Check, Loader2, MapPin, Send, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -5,7 +6,7 @@ import { PhoneShell } from "@/components/PhoneShell";
 import { addAlert } from "@/lib/alerts";
 
 export const Route = createFileRoute("/sos")({
-  head: () => ({ meta: [{ title: "SOS — Código Violeta" }] }),
+  head: () => pageHead("SOS", "Acesso emergencial do Código Violeta. Em risco imediato, ligue 190."),
   component: Sos,
 });
 

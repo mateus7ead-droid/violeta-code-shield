@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   User,
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/informacoes")({
-  head: () => ({ meta: [{ title: "Informações e Ajuda — Código Violeta" }] }),
+  head: () => pageHead("Informações e Ajuda", "Informações sobre violência doméstica, direitos e canais de apoio."),
   component: Informacoes,
 });
 

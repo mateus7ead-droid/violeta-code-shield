@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -20,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => ({ meta: [{ title: "Configurações — Código Violeta" }] }),
+  head: () => pageHead("Configurações", "Gerencie sua conta, ícone e preferências do Código Violeta."),
   component: Configuracoes,
 });
 
