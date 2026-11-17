@@ -3,18 +3,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { UserPlus, CheckCircle2, Lock, BookUser } from "lucide-react";
 import { useState, FormEvent } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
+import { useTrustedContacts } from "@/lib/use-trusted-contacts";
 
 export const Route = createFileRoute("/contato-novo")({
   head: () => pageHead("Adicionar Contato", "Adicione uma pessoa de confiança pelo nome e telefone."),
   component: NovoContato,
 });
-
-const DEFAULTS = [
-  { name: "Mãe", phone: "(79) 99999-1111" },
-  { name: "Melhor amiga", phone: "(79) 98888-2222" },
-  { name: "Irmã", phone: "(79) 97777-3333" },
-  { name: "Primo João", phone: "(79) 96666-4444" },
-];
 
 function formatPhone(v: string) {
   const d = v.replace(/\D/g, "").slice(0, 11);
@@ -24,6 +18,8 @@ function formatPhone(v: string) {
 }
 
 function NovoContato() {
+  const { contacts, save, loading, error } = useTrustedContacts();
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("(79) ");
@@ -56,19 +52,13 @@ function NovoContato() {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!name.trim() || phone.replace(/\D/g, "").length < 10) return;
-    let list: { name: string; phone: string }[] = [];
-    try {
-      const raw = localStorage.getItem("cv:contatos");
-      list = raw ? JSON.parse(raw) : DEFAULTS;
-    } catch {
-      list = DEFAULTS;
-    }
-    list.push({ name: name.trim(), phone: phone.trim() });
-    localStorage.setItem("cv:contatos", JSON.stringify(list));
-    navigate({ to: "/contatos" });
+    setSaving(true);
+    try { await save([...contacts, { name: name.trim(), phone: phone.trim() }]); await navigate({ to: "/contatos" }); }
+    catch { setPickerMsg("Não foi possível salvar o contato."); }
+    finally { setSaving(false); }
   };
 
   return (
@@ -120,6 +110,7 @@ function NovoContato() {
 
         <button
           type="submit"
+          disabled={loading || saving || !!error}
           className="w-full h-13 py-3.5 mt-2 rounded-xl bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 shadow hover:bg-primary/90 transition-colors"
         >
           Salvar Contato

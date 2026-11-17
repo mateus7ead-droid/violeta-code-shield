@@ -94,6 +94,24 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          contacts: Json
+          id: string
+          name: string
+        }
+        Insert: {
+          contacts?: Json
+          id: string
+          name?: string
+        }
+        Update: {
+          contacts?: Json
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Users, MapPin, BookOpen, Clock, BookHeart, MessageCircle, LogOut, LogIn } from "lucide-react";
+import { Users, MapPin, BookOpen, Clock, BookHeart, MessageCircle, LogOut, LogIn, UserRound } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
@@ -32,6 +32,7 @@ function Inicio() {
 
   return (
     <PhoneShell title="Início" showMenu showBell>
+      <div className="flex justify-end mb-3"><Button asChild variant="outline"><Link to="/perfil"><UserRound size={18} />Meu perfil</Link></Button></div>
       <div className="text-center mt-2">
         <h2 className="text-lg font-bold text-foreground">Olá, você está segura?</h2>
         <p className="text-sm text-muted-foreground mt-1">

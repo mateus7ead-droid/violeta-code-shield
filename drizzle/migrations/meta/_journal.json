@@ -8,6 +8,13 @@
       "when": 1794617655503,
       "tag": "0000_create_violeta_conversations",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794928544244,
+      "tag": "0001_private_profiles",
+      "breakpoints": true
     }
   ]
 }

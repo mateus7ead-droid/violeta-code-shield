@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AssistenteRouteImport } from './routes/assistente'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ContatoNovoRouteImport } from './routes/contato-novo'
@@ -22,6 +23,7 @@ import { Route as LocalizacaoRouteImport } from './routes/localizacao'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SosRouteImport } from './routes/sos'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AssistenteIndexRouteImport } from './routes/assistente.index'
 import { Route as AssistenteThreadIdRouteImport } from './routes/assistente.$threadId'
@@ -29,6 +31,10 @@ import { Route as AssistenteThreadIdRouteImport } from './routes/assistente.$thr
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssistenteRoute = AssistenteRouteImport.update({
@@ -91,6 +97,11 @@ const SosRoute = SosRouteImport.update({
   path: '/sos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -121,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/assistente/$threadId': typeof AssistenteThreadIdRoute
   '/assistente/': typeof AssistenteIndexRoute
@@ -138,6 +150,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/assistente/$threadId': typeof AssistenteThreadIdRoute
   '/assistente': typeof AssistenteIndexRoute
@@ -145,6 +158,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/assistente': typeof AssistenteRouteWithChildren
   '/configuracoes': typeof ConfiguracoesRoute
   '/contato-novo': typeof ContatoNovoRoute
@@ -157,6 +171,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sobre': typeof SobreRoute
   '/sos': typeof SosRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/api/chat': typeof ApiChatRoute
   '/assistente/$threadId': typeof AssistenteThreadIdRoute
   '/assistente/': typeof AssistenteIndexRoute
@@ -177,6 +192,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre'
     | '/sos'
+    | '/perfil'
     | '/api/chat'
     | '/assistente/$threadId'
     | '/assistente/'
@@ -194,12 +210,14 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre'
     | '/sos'
+    | '/perfil'
     | '/api/chat'
     | '/assistente/$threadId'
     | '/assistente'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/assistente'
     | '/configuracoes'
     | '/contato-novo'
@@ -212,6 +230,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sobre'
     | '/sos'
+    | '/_authenticated/perfil'
     | '/api/chat'
     | '/assistente/$threadId'
     | '/assistente/'
@@ -219,6 +238,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AssistenteRoute: typeof AssistenteRouteWithChildren
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   ContatoNovoRoute: typeof ContatoNovoRoute
@@ -241,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/assistente': {
@@ -327,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -351,6 +385,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface AssistenteRouteChildren {
   AssistenteThreadIdRoute: typeof AssistenteThreadIdRoute
   AssistenteIndexRoute: typeof AssistenteIndexRoute
@@ -367,6 +412,7 @@ const AssistenteRouteWithChildren = AssistenteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AssistenteRoute: AssistenteRouteWithChildren,
   ConfiguracoesRoute: ConfiguracoesRoute,
   ContatoNovoRoute: ContatoNovoRoute,

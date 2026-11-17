@@ -37,3 +37,8 @@ export function deleteAlert(id: string) {
   const list = getAlerts().filter((a) => a.id !== id);
   localStorage.setItem(KEY, JSON.stringify(list));
 }
+
+export function cancelAlert(id: string) {
+  const list = getAlerts().map(event => event.id === id ? { ...event, canceled: true, title: "SOS cancelado", sub: "Cancelado no aplicativo; mensagens enviadas não são desfeitas" } : event);
+  localStorage.setItem(KEY, JSON.stringify(list));
+}
