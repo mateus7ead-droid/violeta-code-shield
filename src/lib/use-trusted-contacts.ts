@@ -14,15 +14,30 @@ export function useTrustedContacts() {
   const key = ["profile", session?.user.id];
   const query = useQuery({ queryKey: key, queryFn: () => load(), enabled: ready && !!session });
   useEffect(() => {
-    try { setLocal(contactsSchema.parse(JSON.parse(localStorage.getItem("cv:contatos") ?? "[]"))); } catch { setLocal([]); }
+    try {
+      setLocal(contactsSchema.parse(JSON.parse(localStorage.getItem("cv:contatos") ?? "[]")));
+    } catch {
+      setLocal([]);
+    }
   }, []);
   return {
-    contacts: session ? query.data?.contacts ?? [] : local,
+    contacts: session ? (query.data?.contacts ?? []) : local,
     loading: !ready || (!!session && query.isPending),
     error: query.error,
     save: async (contacts: TrustedContact[]) => {
-      if (session) { await save({ data: contacts }); await cache.invalidateQueries({ queryKey: key }); }
-      else { localStorage.setItem("cv:contatos", JSON.stringify(contacts)); setLocal(contacts); }
+      const validated = contactsSchema.parse(contacts);
+      if (session) {
+        const saved = await save({ data: validated });
+        cache.setQueryData(
+          key,
+          (previous: { name: string; contacts: TrustedContact[] } | undefined) =>
+            previous ? { ...previous, contacts: saved } : undefined,
+        );
+        await cache.invalidateQueries({ queryKey: key });
+      } else {
+        localStorage.setItem("cv:contatos", JSON.stringify(validated));
+        setLocal(validated);
+      }
     },
   };
 }

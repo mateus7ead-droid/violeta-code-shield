@@ -1,6 +1,16 @@
 import { pageHead } from "@/lib/page-head";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BellOff, Image as ImageIcon, Lock, Trash2, Info, ChevronRight, Check, Zap, ShieldCheck } from "lucide-react";
+import {
+  BellOff,
+  Image as ImageIcon,
+  Lock,
+  Trash2,
+  Info,
+  ChevronRight,
+  Check,
+  Zap,
+  ShieldCheck,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 import {
@@ -15,13 +25,21 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
-import { APP_ICON_KEY, APP_ICONS, applyAppIcon, getSavedAppIcon, type AppIconId } from "@/lib/appIcon";
+import {
+  APP_ICON_KEY,
+  APP_ICONS,
+  applyAppIcon,
+  getSavedAppIcon,
+  type AppIconId,
+} from "@/lib/appIcon";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTrustedContacts } from "@/lib/use-trusted-contacts";
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => pageHead("Configurações", "Gerencie sua conta, ícone e preferências do Código Violeta."),
+  head: () =>
+    pageHead("Configurações", "Gerencie sua conta, ícone e preferências do Código Violeta."),
   component: Configuracoes,
 });
 
@@ -48,6 +66,28 @@ function Configuracoes() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const navigate = useNavigate();
   const cache = useQueryClient();
+  const {
+    save: saveContacts,
+    loading: contactsLoading,
+    error: contactsError,
+  } = useTrustedContacts();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteNotice, setDeleteNotice] = useState("");
+  const deleteContacts = async () => {
+    setDeleting(true);
+    setDeleteNotice("");
+    try {
+      await saveContacts([]);
+      localStorage.removeItem("cv:contatos");
+      setDeleteNotice("Contatos excluídos.");
+      return true;
+    } catch {
+      setDeleteNotice("Não foi possível excluir os contatos. Tente novamente.");
+      return false;
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     setSelectedIcon(getSavedAppIcon());
@@ -127,7 +167,11 @@ function Configuracoes() {
             sub={`Atual: ${currentIcon.label}`}
             right={
               <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
-                <img src={currentIcon.img} alt={currentIcon.label} className="w-full h-full object-cover" />
+                <img
+                  src={currentIcon.img}
+                  alt={currentIcon.label}
+                  className="w-full h-full object-cover"
+                />
               </div>
             }
           />
@@ -143,32 +187,44 @@ function Configuracoes() {
           <Row
             icon={Zap}
             title="Botão de SOS discreto"
-            sub={
-              sosTrigger === "off"
-                ? "Desativado"
-                : `Ativo: 3x ${TRIGGER_LABEL[sosTrigger]}`
-            }
+            sub={sosTrigger === "off" ? "Desativado" : `Ativo: 3x ${TRIGGER_LABEL[sosTrigger]}`}
           />
         </button>
         <button onClick={() => setDeleteOpen(true)} className="w-full text-left">
-          <Row icon={Trash2} title="Excluir meus dados" sub="Apaga todas as suas informações" />
+          <Row
+            icon={Trash2}
+            title="Excluir meus dados"
+            sub="Gerenciar contatos e registros deste aparelho"
+          />
         </button>
         <button onClick={() => setAboutOpen(true)} className="w-full text-left">
           <Row icon={Info} title="Sobre o app" sub="Versão 1.0.0" />
         </button>
       </div>
 
-      <Button variant="outline" className="mt-10 w-full" onClick={async () => { await cache.cancelQueries(); cache.clear(); const { error } = await supabase.auth.signOut(); if (!error) await navigate({ to: "/", replace: true }); }}>Sair da conta</Button>
+      <Button
+        variant="outline"
+        className="mt-10 w-full"
+        onClick={async () => {
+          await cache.cancelQueries();
+          cache.clear();
+          const { error } = await supabase.auth.signOut();
+          if (!error) await navigate({ to: "/", replace: true });
+        }}
+      >
+        Sair da conta
+      </Button>
 
       <Dialog open={iconOpen} onOpenChange={setIconOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Escolher ícone do app</DialogTitle>
             <DialogDescription>
-              Escolha um disfarce e depois toque em "Adicionar à tela inicial" no navegador — o app será instalado já com o ícone e nome disfarçados.
+              Escolha um disfarce e depois toque em "Adicionar à tela inicial" no navegador — o app
+              será instalado já com o ícone e nome disfarçados.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-4 gap-3 pt-2">
+          <div className="grid grid-cols-3 gap-3 pt-2">
             {ICON_OPTIONS.map((opt) => (
               <button
                 key={opt.id}
@@ -239,7 +295,8 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Botão de SOS discreto</DialogTitle>
             <DialogDescription>
-              Aperte 3 vezes seguidas o botão escolhido quando o aplicativo estiver aberto e o navegador permitir detectar esses botões.
+              Aperte 3 vezes seguidas o botão escolhido quando o aplicativo estiver aberto e o
+              navegador permitir detectar esses botões.
             </DialogDescription>
           </DialogHeader>
           <RadioGroup
@@ -247,11 +304,13 @@ function Configuracoes() {
             onValueChange={(v) => saveSosTrigger(v as SosTrigger)}
             className="pt-2"
           >
-            {([
-              ["off", "Desativado"],
-              ["volup", "Botão Volume +"],
-              ["voldown", "Botão Volume −"],
-            ] as const).map(([val, label]) => (
+            {(
+              [
+                ["off", "Desativado"],
+                ["volup", "Botão Volume +"],
+                ["voldown", "Botão Volume −"],
+              ] as const
+            ).map(([val, label]) => (
               <label
                 key={val}
                 className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-primary-soft"
@@ -262,7 +321,8 @@ function Configuracoes() {
             ))}
           </RadioGroup>
           <p className="text-xs text-muted-foreground">
-            Não funciona com o aplicativo fechado ou a tela bloqueada. O SOS abre as opções de ajuda; mensagens precisam de confirmação.
+            Não funciona com o aplicativo fechado ou a tela bloqueada. O SOS abre as opções de
+            ajuda; mensagens precisam de confirmação.
           </p>
           <DialogFooter>
             <Button onClick={() => setSosOpen(false)}>Concluir</Button>
@@ -275,42 +335,50 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Excluir meus dados</DialogTitle>
             <DialogDescription>
-              Esta ação remove permanentemente os dados salvos neste aparelho.
+              Exclua os contatos da conta conectada e deste aparelho, ou os registros locais. Seu
+              nome, diário e conversas não são apagados aqui.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 pt-1">
-            <DataDeleteRow
-              label="Contatos de confiança"
-              storageKey="cv:contatos"
-            />
-            <DataDeleteRow
-              label="Histórico de alertas"
-              storageKey="cv:alerts"
-            />
+            <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
+              <span className="text-sm">Contatos de confiança</span>
+              <Button
+                variant="ghost"
+                className="text-sos"
+                disabled={deleting || contactsLoading || !!contactsError}
+                onClick={() => void deleteContacts()}
+              >
+                {deleting ? "Excluindo…" : "Excluir"}
+              </Button>
+            </div>
+            <DataDeleteRow label="Histórico de alertas" storageKey="cv:alerts" />
             <DataDeleteRow
               label="PIN de segurança"
               storageKey="cv:pin"
               onAfter={() => setHasPin(false)}
             />
           </div>
+          {deleteNotice && (
+            <p role="status" className="text-sm">
+              {deleteNotice}
+            </p>
+          )}
           <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
               Fechar
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                localStorage.removeItem("cv:contatos");
+              disabled={deleting || contactsLoading || !!contactsError}
+              onClick={async () => {
+                if (!(await deleteContacts())) return;
                 localStorage.removeItem("cv:alerts");
                 localStorage.removeItem("cv:pin");
                 setHasPin(false);
                 setDeleteOpen(false);
               }}
             >
-              Excluir tudo
+              Excluir contatos, histórico e PIN
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -327,20 +395,23 @@ function Configuracoes() {
           </DialogHeader>
           <div className="space-y-3 text-sm text-foreground/85">
             <p>
-              O <strong>Código Violeta</strong> é um aplicativo de proteção pessoal voltado a mulheres em situação de risco de violência doméstica.
+              O <strong>Código Violeta</strong> é um aplicativo de proteção pessoal voltado a
+              mulheres em situação de risco de violência doméstica.
             </p>
             <p>
-              Com um único toque — ou pelo botão de SOS discreto — o app envia um alerta com a sua localização aos seus contatos de confiança.
+              O SOS permite ligar para 190 e preparar uma mensagem com a localização para os
+              contatos de confiança. É necessário confirmar o envio no aplicativo de mensagens.
             </p>
             <ul className="list-disc pl-5 space-y-1 text-foreground/80">
               <li>Botão SOS rápido e discreto</li>
               <li>Compartilhamento de localização em tempo real</li>
-              <li>Histórico de alertas enviados</li>
-              <li>PIN de segurança e ícone disfarçado</li>
+              <li>Histórico de acionamentos do SOS</li>
+              <li>Ícone disfarçado para instalação</li>
             </ul>
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
               <ShieldCheck size={14} className="text-primary" />
-              Contatos e diário ficam neste aparelho. Conversas com a assistente ficam na sua conta.
+              Nome, contatos e conversas ficam na conta quando você está conectada. Diário e
+              histórico de SOS ficam neste aparelho.
             </div>
           </div>
           <DialogFooter>
@@ -373,10 +444,7 @@ function DataDeleteRow({
   return (
     <div className="flex items-center justify-between p-3 rounded-lg border border-border">
       <span className="text-sm text-foreground">{label}</span>
-      <button
-        onClick={handle}
-        className="text-xs text-sos font-semibold hover:underline"
-      >
+      <button onClick={handle} className="text-xs text-sos font-semibold hover:underline">
         Excluir
       </button>
     </div>

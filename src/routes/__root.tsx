@@ -122,12 +122,16 @@ function RootComponent() {
   useEffect(() => {
     let active = true;
     let revision = 0;
+    let identity: string | null | undefined;
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       revision += 1;
       if (!active) return;
       if (event === "PASSWORD_RECOVERY") sessionStorage.setItem("cv:passwordRecovery", "true");
       setAuth({ session, ready: true });
-      if (["SIGNED_IN", "SIGNED_OUT", "USER_UPDATED"].includes(event)) {
+      const nextIdentity = session?.user.id ?? null;
+      const changed = identity !== undefined && identity !== nextIdentity;
+      identity = nextIdentity;
+      if (changed || event === "USER_UPDATED") {
         void router.invalidate();
         if (event !== "SIGNED_OUT") void queryClient.invalidateQueries();
       }

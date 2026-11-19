@@ -1,5 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Users, MapPin, BookOpen, Clock, BookHeart, MessageCircle, LogOut, LogIn, UserRound } from "lucide-react";
+import {
+  Users,
+  MapPin,
+  BookOpen,
+  Clock,
+  BookHeart,
+  MessageCircle,
+  LogOut,
+  LogIn,
+  UserRound,
+} from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
@@ -7,9 +17,9 @@ import { useAppAuth } from "@/lib/auth-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-
 export const Route = createFileRoute("/inicio")({
-  head: () => pageHead("Início", "Acesse o SOS, seus contatos, diário e a assistente Maria da Penha."),
+  head: () =>
+    pageHead("Início", "Acesse o SOS, seus contatos, diário e a assistente Maria da Penha."),
   component: Inicio,
 });
 
@@ -32,7 +42,14 @@ function Inicio() {
 
   return (
     <PhoneShell title="Início" showMenu showBell>
-      <div className="flex justify-end mb-3"><Button asChild variant="outline"><Link to="/perfil"><UserRound size={18} />Meu perfil</Link></Button></div>
+      <div className="flex justify-end mb-3">
+        <Button asChild variant="outline">
+          <Link to="/perfil">
+            <UserRound size={18} />
+            Meu perfil
+          </Link>
+        </Button>
+      </div>
       <div className="text-center mt-2">
         <h2 className="text-lg font-bold text-foreground">Olá, você está segura?</h2>
         <p className="text-sm text-muted-foreground mt-1">
@@ -41,12 +58,13 @@ function Inicio() {
       </div>
 
       <div className="flex justify-center my-8">
-        <button
+        <Button
           onClick={handleSos}
           aria-label="Acionar SOS"
-          className="relative flex items-center justify-center w-56 h-56 rounded-full bg-sos text-sos-foreground shadow-[0_15px_40px_-10px_oklch(0.62_0.23_12/0.6)] active:scale-95 transition-transform"
+          variant="destructive"
+          className="relative flex items-center justify-center w-56 h-56 rounded-full bg-sos text-sos-foreground shadow-sos hover:bg-sos active:scale-95 transition-transform motion-reduce:transition-none"
         >
-          <span className="absolute inset-0 rounded-full ring-8 ring-sos/20 animate-pulse" />
+          <span className="absolute inset-0 rounded-full ring-8 ring-sos/20 animate-pulse motion-reduce:animate-none" />
           <div className="text-center">
             <div className="text-5xl font-extrabold tracking-wider">SOS</div>
             <div className="text-xs mt-2 font-semibold tracking-wide">
@@ -55,7 +73,7 @@ function Inicio() {
               PEDIR AJUDA
             </div>
           </div>
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -72,7 +90,30 @@ function Inicio() {
           </Link>
         ))}
       </div>
-      <div className="mt-6 border-t border-border pt-4">{session ? <Button variant="outline" className="w-full" onClick={async () => { await cache.cancelQueries(); cache.clear(); const { error } = await supabase.auth.signOut(); if (!error) await navigate({ to: "/", replace: true }); }}><LogOut size={18} />Sair da conta</Button> : <Button asChild variant="outline" className="w-full"><Link to="/"><LogIn size={18} />Entrar na conta</Link></Button>}</div>
+      <div className="mt-6 border-t border-border pt-4">
+        {session ? (
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={async () => {
+              await cache.cancelQueries();
+              cache.clear();
+              const { error } = await supabase.auth.signOut();
+              if (!error) await navigate({ to: "/", replace: true });
+            }}
+          >
+            <LogOut size={18} />
+            Sair da conta
+          </Button>
+        ) : (
+          <Button asChild variant="outline" className="w-full">
+            <Link to="/">
+              <LogIn size={18} />
+              Entrar na conta
+            </Link>
+          </Button>
+        )}
+      </div>
     </PhoneShell>
   );
 }
