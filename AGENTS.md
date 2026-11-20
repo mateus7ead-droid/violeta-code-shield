@@ -8,5 +8,5 @@
 - Keep a single root auth subscriber and share its hydrated state through context; the public entry screen owns login and recovery, while assistant actions require a session.
 - Keep home-screen support manifest-only, with generated public icon sizes derived from the supplied original; do not register an app-shell worker.
 - Store account names and trusted contacts in owner-scoped profiles with RLS and authenticated server functions; signed-out SOS may use local contacts so emergencies never require login.
-- Put private profile pages under the client-only authenticated layout, redirecting to the existing public entry login, to prevent SSR session gaps.
+- Put private profile pages under the client-only authenticated layout; unauthenticated access redirects to the public entry with a document reload to avoid stale router matches during hydration.
 - Use the shared trusted-contact hook for contact changes, including settings deletion, so authenticated account data and cached views stay consistent.
