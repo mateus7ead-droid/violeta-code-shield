@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Save, Trash2, UserRound, Users } from "lucide-react";
+import { MapPin, Plus, Save, Trash2, UserRound, Users } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,20 +32,46 @@ function Profile() {
   const key = ["profile", session?.user.id];
   const query = useQuery({ queryKey: key, queryFn: () => load(), enabled: ready && !!session });
   const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
   const [contacts, setContacts] = useState<TrustedContact[]>([]);
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const fillCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setNotice("Seu aparelho não permite obter a localização.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setAddress(
+          `Localização atual: ${latitude.toFixed(6)}, ${longitude.toFixed(6)} (https://www.google.com/maps?q=${latitude},${longitude})`,
+        );
+        setDirty(true);
+        setLocating(false);
+        setNotice("Localização adicionada. Salve o perfil para guardar.");
+      },
+      () => {
+        setLocating(false);
+        setNotice("Não foi possível obter sua localização. Verifique a permissão do navegador.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
   useEffect(() => {
     if (query.data && !dirty) {
       setName(query.data.name);
+      setAddress(query.data.address);
       setContacts(query.data.contacts);
     }
   }, [query.data, dirty]);
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setNotice("");
-    const result = profileSchema.safeParse({ name, contacts });
+    const result = profileSchema.safeParse({ name, address, contacts });
     if (!result.success) {
       setNotice(result.error.issues[0]?.message ?? "Confira os dados.");
       return;
@@ -106,6 +132,32 @@ function Profile() {
                   placeholder="Digite seu nome"
                   className="h-12"
                 />
+              </div>
+              <div>
+                <label htmlFor="profile-address" className="block mb-2 font-semibold text-sm">
+                  Endereço da minha residência
+                </label>
+                <Input
+                  id="profile-address"
+                  autoComplete="street-address"
+                  value={address}
+                  onChange={(event) => {
+                    setAddress(event.target.value);
+                    setDirty(true);
+                  }}
+                  placeholder="Rua, número, bairro, cidade"
+                  className="h-12"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="mt-2 w-full"
+                  disabled={locating}
+                  onClick={fillCurrentLocation}
+                >
+                  <MapPin />
+                  {locating ? "Obtendo localização…" : "Usar minha localização atual"}
+                </Button>
               </div>
               <section className="space-y-4">
                 <h2 className="flex items-center gap-2 font-semibold">

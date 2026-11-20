@@ -3,9 +3,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { contactsSchema, profileSchema } from "./profile-schema";
 
 export const getProfile = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
-  const { data, error } = await context.supabase.from("profiles").select("name, contacts").eq("id", context.userId).maybeSingle();
+  const { data, error } = await context.supabase.from("profiles").select("name, address, contacts").eq("id", context.userId).maybeSingle();
   if (error) throw new Error("Não foi possível carregar seu perfil.");
-  return { name: data?.name ?? "", contacts: contactsSchema.parse(data?.contacts ?? []) };
+  return { name: data?.name ?? "", address: data?.address ?? "", contacts: contactsSchema.parse(data?.contacts ?? []) };
 });
 export const saveProfile = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input: unknown) => profileSchema.parse(input)).handler(async ({ context, data }) => {
   const { error } = await context.supabase.from("profiles").upsert({ id: context.userId, ...data });

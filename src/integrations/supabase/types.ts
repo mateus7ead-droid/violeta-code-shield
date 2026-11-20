@@ -96,16 +96,19 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string
           contacts: Json
           id: string
           name: string
         }
         Insert: {
+          address?: string
           contacts?: Json
           id: string
           name?: string
         }
         Update: {
+          address?: string
           contacts?: Json
           id?: string
           name?: string
