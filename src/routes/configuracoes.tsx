@@ -381,11 +381,13 @@ function Configuracoes() {
                 finally { setDeletingConversations(false); }
               }}>{deletingConversations ? "Excluindo…" : "Excluir"}</Button>
             </div>
-            <DataDeleteRow label="Histórico de alertas" storageKey="cv:alerts" />
+            <DataDeleteRow label="Histórico de alertas" storageKey="cv:alerts" confirmMessage="Excluir todo o histórico de alertas? Esta ação não pode ser desfeita." onSaved={() => setDeleteNotice("Histórico de alertas excluído com sucesso.")} />
             <DataDeleteRow
               label="PIN de segurança"
               storageKey="cv:pin"
+              confirmMessage="Excluir o PIN de segurança salvo neste aparelho? Esta ação não pode ser desfeita."
               onAfter={() => setHasPin(false)}
+              onSaved={() => setDeleteNotice("PIN de segurança excluído com sucesso.")}
             />
           </div>
           {deleteNotice && (
