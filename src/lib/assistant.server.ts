@@ -72,7 +72,7 @@ export async function handleAssistant(request: Request) {
     // The incoming body was already consumed by request.json(). Only headers and
     // the abort signal are needed by the gateway; copying its body throws.
     const monitoredRequest = new Request(request.url, { headers: request.headers, signal: request.signal });
-    const call = createResponsesCall(monitoredRequest, { baseURL: "https://ai.gateway.lovable.dev/v1", apiKey: aiKey, model: "openai/gpt-6-astra" }, await convertToModelMessages(messages.map(m => ({ ...m, parts: m.parts.filter(p => p.type !== "reasoning") }))), instructions);
+    const call = createResponsesCall(monitoredRequest, { baseURL: "https://ai.gateway.lovable.dev/v1", apiKey: aiKey, model: "openai/gpt-6-astra" }, await convertToModelMessages(messages.map(m => ({ ...m, parts: m.parts.filter(p => p.type === "text") }))), instructions);
     const iterator = call.result.fullStream[Symbol.asyncIterator]();
     // Wait only for the first upstream event, never the completed answer.
     const first = await iterator.next();
