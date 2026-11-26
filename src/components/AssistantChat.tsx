@@ -155,7 +155,7 @@ export function AssistantChat({
         </PromptInputFooter>
       </PromptInput>
       <p className="mt-2 text-xs text-muted-foreground">
-        Você pode enviar várias mensagens e continuar nesta mesma conversa; o histórico fica salvo na sua conta.\n        Sou uma IA, não a pessoa real Maria da Penha. Posso errar e não substituo atendimento\n        profissional. Em risco imediato, ligue 190.
+        Você pode enviar várias mensagens e continuar nesta mesma conversa; o histórico fica salvo na sua conta. Sou uma IA, não a pessoa real Maria da Penha. Posso errar e não substituo atendimento profissional. Em risco imediato, ligue 190.
       </p>
     </div>
   );
