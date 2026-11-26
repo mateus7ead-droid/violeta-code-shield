@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,6 +30,7 @@ export function AssistantChat({
 }) {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
   const input = useRef<HTMLTextAreaElement>(null);
   const cache = useQueryClient();
   const transport = useMemo(
@@ -57,8 +59,9 @@ export function AssistantChat({
     id: threadId,
     messages: initialMessages,
     transport,
-    onError: (e) => setError(e.message),
+    onError: (e) => { setError(e.message); setSaved(false); },
     onFinish: () => {
+      setSaved(true);
       void cache.invalidateQueries({ queryKey: ["assistant-threads"] });
       void cache.invalidateQueries({ queryKey: ["assistant-thread", threadId] });
     },
@@ -70,6 +73,7 @@ export function AssistantChat({
   const send = (value: string) => {
     if (!value.trim() || busy) return;
     setError("");
+    setSaved(false);
     setText("");
     void sendMessage({ text: value.trim() });
     input.current?.focus();
@@ -125,6 +129,7 @@ export function AssistantChat({
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
+      {saved && !busy && <p role="status" className="mb-2 flex items-center gap-2 text-xs font-semibold text-green-700"><CheckCircle2 size={16} /> Resposta recebida e conversa salva.</p>}
       {error && (
         <p role="alert" className="mb-3 text-sm text-destructive">
           {error}
