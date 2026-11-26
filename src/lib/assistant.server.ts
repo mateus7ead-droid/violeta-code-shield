@@ -60,9 +60,17 @@ export async function handleAssistant(request: Request) {
     stored.push(...rows.data.map(r => r.message as unknown as UIMessage));
     if (rows.data.length < 500) break; offset += 500;
   }
-  const messages = [...stored.filter(m => m.id !== latest.id), latest];
-  const saved = await client.from("ai_messages").upsert({ user_id: userId, thread_id: threadId, sdk_id: latest.id, message: latest as unknown as Json }, { onConflict: "thread_id,sdk_id" });
-  if (saved.error) return Response.json({ error: "Sua pergunta não pôde ser guardada. Tente novamente." }, { status: 503 });
+  // Persiste o histórico completo recebido do cliente (perguntas e respostas anteriores),
+  // não apenas a última pergunta. O upsert evita duplicatas por thread_id + sdk_id.
+  const incomingRows = incoming.map(message => ({
+    user_id: userId,
+    thread_id: threadId,
+    sdk_id: message.id,
+    message: message as unknown as Json,
+  }));
+  const saved = await client.from("ai_messages").upsert(incomingRows, { onConflict: "thread_id,sdk_id" });
+  if (saved.error) return Response.json({ error: "O histórico da conversa não pôde ser guardado. Tente novamente." }, { status: 503 });
+  const messages = [...stored.filter(m => !incoming.some(item => item.id === m.id)), ...incoming];
   const title = latest.parts.filter(p => p.type === "text").map(p => p.text).join(" ").slice(0, 70);
   const updated = await client.from("ai_threads").update({ updated_at: new Date().toISOString(), ...(thread.data.title === "Nova conversa" ? { title } : {}) }).eq("id", threadId).eq("user_id", userId);
   if (updated.error) return Response.json({ error: "Não foi possível atualizar a conversa." }, { status: 503 });
