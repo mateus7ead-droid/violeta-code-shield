@@ -346,8 +346,7 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Excluir meus dados</DialogTitle>
             <DialogDescription>
-              Exclua os contatos da conta conectada e deste aparelho, ou os registros locais. Seu
-              nome, diário e conversas não são apagados aqui.
+              Cada opção é independente. Excluir o diário não apaga suas conversas, e excluir as conversas não apaga o diário.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 pt-1">
@@ -390,7 +389,8 @@ function Configuracoes() {
             />
           </div>
           {deleteNotice && (
-            <p role="status" className="text-sm">
+            <p role="status" className={`flex items-center gap-2 text-sm font-semibold ${deleteNotice.includes("sucesso") || deleteNotice.includes("excluídos") ? "text-green-700" : "text-destructive"}`}>
+              {deleteNotice.includes("sucesso") || deleteNotice.includes("excluídos") ? <Check size={17} /> : null}
               {deleteNotice}
             </p>
           )}
@@ -398,19 +398,7 @@ function Configuracoes() {
             <Button variant="outline" onClick={() => setDeleteOpen(false)}>
               Fechar
             </Button>
-            <Button
-              variant="destructive"
-              disabled={deleting || contactsLoading || !!contactsError}
-              onClick={async () => {
-                if (!(await deleteContacts())) return;
-                localStorage.removeItem("cv:alerts");
-                localStorage.removeItem("cv:pin");
-                setHasPin(false);
-                setDeleteOpen(false);
-              }}
-            >
-              Excluir contatos, histórico e PIN
-            </Button>
+
           </DialogFooter>
         </DialogContent>
       </Dialog>
