@@ -33,10 +33,22 @@ export function LoginForm() {
           setNotice(error ? "Não foi possível enviar o e-mail. Tente novamente." : "Se houver uma conta com esse e-mail, você receberá um link para redefinir a senha.");
         } else {
           const result = signup
-            ? await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: window.location.origin } })
-            : await supabase.auth.signInWithPassword({ email: email.trim(), password });
-          if (result.error) setNotice(result.error.code === "email_not_confirmed" ? "Confirme sua conta pelo link enviado ao seu e-mail." : signup ? "Não foi possível criar a conta. Confira o e-mail e use uma senha de pelo menos 8 caracteres." : "Não foi possível entrar. Confira seu e-mail, senha e confirmação da conta.");
-          else if (signup && !result.data.session) setNotice("Confira seu e-mail para confirmar a conta antes de entrar.");
+            ? await supabase.auth.signUp({ email: email.trim().toLowerCase(), password, options: { emailRedirectTo: `${window.location.origin}/inicio` } })
+            : await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+          if (result.error) {
+            const code = result.error.code;
+            if (code === "email_not_confirmed") setNotice("Sua conta ainda não foi confirmada. Abra o link enviado ao seu e-mail.");
+            else if (code === "email_exists" || code === "user_already_exists") setNotice("Este e-mail já possui cadastro. Entre na sua conta ou recupere a senha.");
+            else if (code === "invalid_credentials") setNotice("E-mail ou senha incorretos.");
+            else if (code === "weak_password") setNotice("A senha precisa ter pelo menos 8 caracteres e atender aos critérios de segurança.");
+            else setNotice(`Não foi possível concluir. ${result.error.message}`);
+          } else if (signup && !result.data.session) {
+            setNotice("Cadastro recebido! Verifique sua caixa de entrada e o spam para confirmar seu e-mail. O link abrirá o aplicativo.");
+          } else if (signup) {
+            setNotice("Conta criada e acesso liberado com sucesso!");
+          } else {
+            setNotice("Login realizado com sucesso!");
+          }
         }
       } catch { setNotice("Não foi possível conectar. Tente mais tarde."); }
       finally { setBusy(false); }
