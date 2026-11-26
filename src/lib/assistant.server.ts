@@ -28,8 +28,23 @@ export async function handleAssistant(request: Request) {
   try {
     const body = z.object({ threadId: z.string().uuid(), messages: z.array(z.unknown()).min(1) }).parse(await request.json());
     threadId = body.threadId;
-    incoming = await validateUIMessages({ messages: body.messages });
-    if (incoming.some(m => !["user", "assistant"].includes(m.role) || m.parts.some(p => !["text", "reasoning"].includes(p.type)))) throw new Error("Invalid message");
+    // O chat pode devolver partes auxiliares do SDK (reasoning/step metadata).
+    // Para esta assistente, persistimos e processamos apenas texto, evitando
+    // rejeitar a segunda pergunta por causa de partes não textuais do histórico.
+    const parsed = z.array(z.object({
+      id: z.string(),
+      role: z.enum(["user", "assistant"]),
+      parts: z.array(z.unknown()),
+    })).safeParse(body.messages);
+    if (!parsed.success) throw new Error("Invalid message shape");
+    incoming = parsed.data.map((message) => ({
+      id: message.id,
+      role: message.role,
+      parts: message.parts.flatMap((part) => {
+        const textPart = z.object({ type: z.literal("text"), text: z.string() }).safeParse(part);
+        return textPart.success ? [{ type: "text" as const, text: textPart.data.text }] : [];
+      }),
+    })).filter((message) => message.parts.length > 0) as UIMessage[];
   } catch { return Response.json({ error: "Mensagem inválida. Escreva sua pergunta novamente." }, { status: 400 }); }
   const thread = await client.from("ai_threads").select("id,title").eq("id", threadId).eq("user_id", userId).single();
   if (thread.error) return Response.json({ error: "Conversa não encontrada." }, { status: 404 });
