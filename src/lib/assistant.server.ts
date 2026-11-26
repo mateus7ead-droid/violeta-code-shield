@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { convertToModelMessages, validateUIMessages, type UIMessage } from "ai";
+import { convertToModelMessages, type UIMessage } from "ai";
 import { z } from "zod";
 import type { Database, Json } from "@/integrations/supabase/types";
 import { createResponsesCall } from "./ai/responses.ts";
