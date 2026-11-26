@@ -104,14 +104,48 @@ function Profile() {
     <PhoneShell title="Meu Perfil" showBack>
       <div className="mx-auto max-w-lg">
         <div className="flex items-center gap-4 border-b border-border pb-5 mb-6">
-          <span className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
-            <UserRound size={32} />
-          </span>
+          <div className="relative shrink-0">
+            <button type="button" onClick={() => avatarInput.current?.click()} aria-label="Adicionar ou alterar foto de perfil"
+              className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-primary-soft text-primary">
+              {avatar ? <img src={avatar} alt="Foto de perfil" className="h-full w-full object-cover" /> : <UserRound size={38} />}
+              <span className="absolute bottom-0 right-0 rounded-full bg-primary p-1 text-primary-foreground"><Camera size={14} /></span>
+            </button>
+            <input ref={avatarInput} type="file" accept="image/*" className="hidden" onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.currentTarget.value = "";
+              if (!file) return;
+              if (!file.type.startsWith("image/")) { setAvatarNotice("Selecione um arquivo de imagem."); return; }
+              if (file.size > 8 * 1024 * 1024) { setAvatarNotice("A imagem deve ter no máximo 8 MB."); return; }
+              const reader = new FileReader();
+              reader.onload = () => {
+                const image = new Image();
+                image.onload = () => {
+                  const scale = Math.min(1, 600 / Math.max(image.width, image.height));
+                  const canvas = document.createElement("canvas");
+                  canvas.width = Math.max(1, Math.round(image.width * scale));
+                  canvas.height = Math.max(1, Math.round(image.height * scale));
+                  const ctx = canvas.getContext("2d");
+                  if (!ctx) { setAvatarNotice("Não foi possível processar a imagem."); return; }
+                  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                  const compressed = canvas.toDataURL("image/jpeg", 0.75);
+                  try {
+                    localStorage.setItem(`cv:profile-avatar:${session?.user.id}`, compressed);
+                    setAvatar(compressed);
+                    setAvatarNotice("Foto de perfil salva com sucesso!");
+                  } catch { setAvatarNotice("Não há espaço suficiente neste aparelho para salvar a foto."); }
+                };
+                image.onerror = () => setAvatarNotice("Não foi possível abrir essa imagem.");
+                image.src = String(reader.result);
+              };
+              reader.onerror = () => setAvatarNotice("Não foi possível ler a imagem.");
+              reader.readAsDataURL(file);
+            }} />
+          </div>
           <div className="min-w-0">
             <h2 className="font-bold text-xl">Minha conta</h2>
             <p className="text-sm text-muted-foreground break-all">{session?.user.email}</p>
             <button type="button" onClick={() => avatarInput.current?.click()} className="mt-1 text-xs font-semibold text-primary underline">Adicionar ou alterar foto</button>
-            {avatarNotice && <p role="status" className="mt-1 text-xs font-semibold text-green-700">{avatarNotice}</p>}
+            {avatarNotice && <p role="status" className={`mt-1 text-xs font-semibold ${avatarNotice.includes("sucesso") ? "text-green-700" : "text-destructive"}`}>{avatarNotice}</p>}
           </div>
         </div>
         {query.isPending ? (
