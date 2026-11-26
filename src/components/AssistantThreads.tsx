@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Trash2, LogOut, MessageCirclePlus, CheckCircle2 } from "lucide-react";
+import { Trash2, LogOut, MessageCirclePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { createThread, deleteThread, listThreads } from "@/lib/assistant.functions";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,9 @@ export function AssistantThreads({ activeId }: { activeId?: string }) {
   const cache = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [created, setCreated] = useState(false);
 
   const startConversation = async () => {
-    setBusy(true); setError(""); setCreated(false);
+    setBusy(true); setError("");
     try {
       const thread = await create();
       await cache.invalidateQueries({ queryKey: threadsOptions.queryKey });
@@ -69,7 +68,6 @@ export function AssistantThreads({ activeId }: { activeId?: string }) {
       ))}
     </div>
     {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-    {created && <p className="flex items-center gap-2 text-sm text-green-700"><CheckCircle2 size={17} /> Nova conversa criada.</p>}
     <Button disabled={busy} onClick={startConversation}
       className="mt-2 h-14 w-full rounded-xl text-base font-bold shadow-md">
       <MessageCirclePlus size={23} /> {busy ? "Iniciando conversa…" : "INICIAR NOVA CONVERSA"}
