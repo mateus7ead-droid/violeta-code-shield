@@ -1,6 +1,6 @@
 import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
-import { BookHeart, Lock, PenLine, Trash2, ImagePlus, X } from "lucide-react";
+import { BookHeart, Lock, PenLine, Trash2, ImagePlus, X, CheckCircle2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 
@@ -56,6 +56,7 @@ function Diario() {
   const [images, setImages] = useState<string[]>([]);
   const [imageError, setImageError] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,6 +66,7 @@ function Diario() {
   const handleImages = async (files: FileList | null) => {
     if (!files?.length) return;
     setImageError("");
+    setSaved(false);
     try {
       const selected = Array.from(files).slice(0, 3 - images.length);
       if (files.length > selected.length) setImageError("É possível anexar até 3 fotos por desabafo.");
@@ -93,6 +95,7 @@ function Diario() {
       setEntries(next);
       setText("");
       setImages([]);
+      setSaved(true);
       setImageError("");
     } catch {
       setImageError("O armazenamento do aparelho está cheio. Remova fotos antigas e tente novamente.");
@@ -119,7 +122,7 @@ function Diario() {
         <label htmlFor="desabafo" className="text-sm font-semibold text-foreground flex items-center gap-2">
           <PenLine size={16} className="text-primary" /> Como foi o seu dia?
         </label>
-        <textarea id="desabafo" value={text} onChange={(e) => setText(e.target.value)}
+        <textarea id="desabafo" value={text} onChange={(e) => { setText(e.target.value); setSaved(false); }}
           placeholder="Desabafe aqui... conte o que aconteceu, como você se sente, o que quiser."
           rows={5} className="mt-3 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none" />
         <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
@@ -141,6 +144,7 @@ function Diario() {
             ))}
           </div>
         )}
+        {saved && <p role="status" className="mb-2 flex items-center justify-center gap-2 text-sm font-semibold text-green-700"><CheckCircle2 size={18} /> Desabafo salvo com sucesso!</p>}
         <button onClick={handleSave} disabled={!text.trim() && images.length === 0}
           className="mt-3 w-full rounded-lg bg-primary text-primary-foreground py-2.5 text-sm font-semibold disabled:opacity-50 active:scale-[0.98] transition-transform">
           Guardar desabafo
