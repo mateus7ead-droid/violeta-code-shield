@@ -18,6 +18,7 @@ function Sos() {
   const alertId = useRef<string | null>(null);
   const [notice, setNotice] = useState("");
   const started = useRef(false);
+  const smsOpened = useRef(false);
   useEffect(() => {
     let active = true;
     if (!started.current) { started.current = true; alertId.current = addAlert().id; }
@@ -26,6 +27,22 @@ function Sos() {
     return () => { active = false; };
   }, []);
   const message = `EMERGÊNCIA — Código Violeta. Estou em perigo e preciso de ajuda imediata.${location ? ` Minha localização obtida agora: https://www.google.com/maps?q=${location.lat},${location.lon}` : " Não consegui obter minha localização."}`;
+  const openEmergencySms = () => {
+    if (phones.length === 0) {
+      setNotice("Não há contatos de confiança com telefone válido. Cadastre um contato para enviar o alerta.");
+      return;
+    }
+    const separator = /iPad|iPhone|iPod/.test(navigator.userAgent) ? "&" : "?";
+    const recipients = phones.join(/iPad|iPhone|iPod/.test(navigator.userAgent) ? ";" : ",");
+    window.location.href = `sms:${recipients}${separator}body=${encodeURIComponent(message)}`;
+    setNotice("O aplicativo de mensagens foi aberto com o alerta e a localização. Revise e toque em Enviar. O Código Violeta não consegue confirmar a entrega.");
+  };
+
+  useEffect(() => {
+    if (loading || contactsLoading || contactsError || phones.length === 0 || smsOpened.current) return;
+    smsOpened.current = true;
+    openEmergencySms();
+  }, [loading, contactsLoading, contactsError, phones.join(",")]);
   return <PhoneShell title="SOS — Pedir Ajuda" showBack><div className="mx-auto max-w-lg py-4">
     <div className="text-center"><div className="mx-auto size-24 rounded-full bg-primary-soft flex items-center justify-center"><ShieldAlert className="text-primary" size={44} /></div><h2 className="mt-4 text-lg font-bold">{loading ? "Preparando seu pedido de ajuda…" : "SOS acionado"}</h2><p className="mt-2 text-sm text-muted-foreground">Em perigo imediato, ligue 190.</p><p className="mt-3 inline-flex items-center gap-2 text-xs"><MapPin size={16} className="text-primary" />{loading ? "Obtendo localização…" : location ? `Lat ${location.lat.toFixed(5)}, Lon ${location.lon.toFixed(5)}` : "Localização indisponível"}</p></div>
     <ul className="mt-6 space-y-3">
@@ -34,10 +51,10 @@ function Sos() {
       <li className="bg-card border border-border rounded-lg p-4"><Button asChild variant="destructive" className="w-full"><a href="tel:190"><Phone />Ligar para a polícia — 190</a></Button></li>
       <li className="flex items-center gap-3 bg-card border border-border rounded-lg p-4 text-sm"><History className="text-primary" size={20} /><span className="flex-1">Acionamento registrado no histórico</span><Check className="text-primary" size={18} /></li>
     </ul>
-    <Button disabled={loading || contactsLoading || !!contactsError || phones.length === 0} className="mt-5 w-full h-12" onClick={() => { const separator = /iPad|iPhone|iPod/.test(navigator.userAgent) ? "&body=" : "?body="; window.location.href = `sms:${phones.join(",")}${separator}${encodeURIComponent(message)}`; setNotice("Mensagem preparada. Confirme o envio no aplicativo de mensagens; a entrega não pode ser verificada aqui."); }}><Send />Abrir mensagem para contatos</Button>
+    <Button disabled={contactsLoading || !!contactsError || phones.length === 0} className="mt-5 w-full h-12" onClick={openEmergencySms}><Send />Abrir alerta novamente</Button>
     {!contactsLoading && phones.length === 0 && <p className="mt-3 text-sm text-center text-muted-foreground">Nenhum contato salvo. Cadastre seus contatos de confiança.</p>}
     {notice && <p role="status" className="mt-4 text-sm text-primary">{notice}</p>}
-    <p className="mt-4 text-xs text-muted-foreground text-center">O aplicativo não envia mensagens nem chama a polícia automaticamente. O link de localização mostra a posição obtida, não acompanha deslocamentos.</p>
+    <p className="mt-4 text-xs text-muted-foreground text-center">O alerta é preparado automaticamente no aplicativo de mensagens quando os contatos e a localização estiverem carregados. Você precisa confirmar o envio. O Código Violeta não envia SMS em segundo plano nem confirma a entrega. O link mostra a localização obtida naquele momento.</p>
     <Button variant="destructive" className="mt-7 w-full h-12 rounded-full" onClick={() => { const next = taps + 1; setTaps(next); if (next >= 5) { if (alertId.current) cancelAlert(alertId.current); void navigate({ to: "/inicio" }); } }}><BellOff />CANCELAR ALERTA</Button><p className="mt-2 text-center text-xs text-muted-foreground">Toque {Math.max(0, 5 - taps)} vezes para cancelar. Mensagens já enviadas não são desfeitas.</p>
   </div></PhoneShell>;
 }
