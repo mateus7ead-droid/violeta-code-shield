@@ -64,6 +64,7 @@ function Configuracoes() {
   const [sosTrigger, setSosTrigger] = useState<SosTrigger>("off");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [saveNotice, setSaveNotice] = useState("");
   const navigate = useNavigate();
   const cache = useQueryClient();
   const {
@@ -99,6 +100,7 @@ function Configuracoes() {
   const saveSosTrigger = (t: SosTrigger) => {
     setSosTrigger(t);
     localStorage.setItem(SOS_TRIGGER_KEY, t);
+    setSaveNotice("Preferência salva com sucesso.");
   };
 
   const pickIcon = (id: AppIconId) => {
@@ -106,6 +108,7 @@ function Configuracoes() {
     localStorage.setItem(APP_ICON_KEY, id);
     applyAppIcon(id);
     setIconOpen(false);
+    setSaveNotice("Ícone salvo com sucesso.");
   };
 
   const openPin = () => {
@@ -127,18 +130,21 @@ function Configuracoes() {
     localStorage.setItem("cv:pin", pin);
     setHasPin(true);
     setPinOpen(false);
+    setSaveNotice("PIN salvo com sucesso.");
   };
 
   const removePin = () => {
     localStorage.removeItem("cv:pin");
     setHasPin(false);
     setPinOpen(false);
+    setSaveNotice("PIN removido com sucesso.");
   };
 
   const currentIcon = ICON_OPTIONS.find((i) => i.id === selectedIcon) ?? ICON_OPTIONS[0];
 
   return (
     <PhoneShell title="Configurações" showBack>
+      {saveNotice && <p role="status" className="mb-4 flex items-center gap-2 text-sm font-semibold text-green-700"><Check size={17} /> {saveNotice}</p>}
       <div className="bg-card border border-border rounded-xl divide-y divide-border shadow-sm">
         <Row
           icon={BellOff}
