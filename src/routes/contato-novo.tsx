@@ -31,6 +31,7 @@ function parseVCard(raw: string): Array<{ name: string; phone: string }> {
 function NovoContato() {
   const { contacts, save, loading, error } = useTrustedContacts();
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("(79) ");
@@ -88,7 +89,8 @@ function NovoContato() {
     setSaving(true);
     try {
       await save([...contacts, { name: name.trim(), phone: phone.trim() }]);
-      await navigate({ to: "/contatos" });
+      setSaved(true);
+      window.setTimeout(() => { void navigate({ to: "/contatos" }); }, 900);
     } catch {
       setPickerMsg("Não foi possível salvar o contato.");
     } finally {
@@ -129,6 +131,7 @@ function NovoContato() {
           ))}
         </div>
       )}
+      {saved && <p role="status" className="mb-3 flex items-center justify-center gap-2 text-sm font-semibold text-green-700"><CheckCircle2 size={19} /> Contato salvo com sucesso!</p>}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="name" className="block text-sm font-semibold text-foreground mb-2">Nome do contato</label>
@@ -142,7 +145,7 @@ function NovoContato() {
             placeholder="(79) 00000-0000" required
             className="w-full h-12 px-4 rounded-xl border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
         </div>
-        <button type="submit" disabled={loading || saving || !!error}
+        <button type="submit" disabled={loading || saving || saved || !!error}
           className="w-full h-13 py-3.5 mt-2 rounded-xl bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 shadow hover:bg-primary/90 transition-colors">
           Salvar Contato <CheckCircle2 size={20} />
         </button>
