@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Plus, Save, Trash2, UserRound, Users } from "lucide-react";
+import { MapPin, Plus, Save, Trash2, UserRound, Users, Camera, CheckCircle2 } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,9 @@ function Profile() {
   const [address, setAddress] = useState("");
   const [contacts, setContacts] = useState<TrustedContact[]>([]);
   const [notice, setNotice] = useState("");
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatarNotice, setAvatarNotice] = useState("");
+  const avatarInput = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [locating, setLocating] = useState(false);
@@ -61,6 +64,9 @@ function Profile() {
       { enableHighAccuracy: true, timeout: 10000 },
     );
   };
+  useEffect(() => {
+    if (session?.user.id) setAvatar(localStorage.getItem(`cv:profile-avatar:${session.user.id}`));
+  }, [session?.user.id]);
   useEffect(() => {
     if (query.data && !dirty) {
       setName(query.data.name);
@@ -104,6 +110,8 @@ function Profile() {
           <div className="min-w-0">
             <h2 className="font-bold text-xl">Minha conta</h2>
             <p className="text-sm text-muted-foreground break-all">{session?.user.email}</p>
+            <button type="button" onClick={() => avatarInput.current?.click()} className="mt-1 text-xs font-semibold text-primary underline">Adicionar ou alterar foto</button>
+            {avatarNotice && <p role="status" className="mt-1 text-xs font-semibold text-green-700">{avatarNotice}</p>}
           </div>
         </div>
         {query.isPending ? (
