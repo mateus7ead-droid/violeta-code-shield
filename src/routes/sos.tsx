@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MapPin, Phone, Send, ShieldAlert, Check, Loader2, History, Users, BellOff } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { addAlert, cancelAlert } from "@/lib/alerts";
@@ -27,7 +27,7 @@ function Sos() {
     return () => { active = false; };
   }, []);
   const message = `EMERGÊNCIA — Código Violeta. Estou em perigo e preciso de ajuda imediata.${location ? ` Minha localização obtida agora: https://www.google.com/maps?q=${location.lat},${location.lon}` : " Não consegui obter minha localização."}`;
-  const openEmergencySms = () => {
+  const openEmergencySms = useCallback(() => {
     if (phones.length === 0) {
       setNotice("Não há contatos de confiança com telefone válido. Cadastre um contato para enviar o alerta.");
       return;
@@ -36,13 +36,13 @@ function Sos() {
     const recipients = phones.join(/iPad|iPhone|iPod/.test(navigator.userAgent) ? ";" : ",");
     window.location.href = `sms:${recipients}${separator}body=${encodeURIComponent(message)}`;
     setNotice("O aplicativo de mensagens foi aberto com o alerta e a localização. Revise e toque em Enviar. O Código Violeta não consegue confirmar a entrega.");
-  };
+  }, [phones, message]);
 
   useEffect(() => {
     if (loading || contactsLoading || contactsError || phones.length === 0 || smsOpened.current) return;
     smsOpened.current = true;
     openEmergencySms();
-  }, [loading, contactsLoading, contactsError, phones.join(",")]);
+  }, [loading, contactsLoading, contactsError, phones.length, openEmergencySms]);
   return <PhoneShell title="SOS — Pedir Ajuda" showBack><div className="mx-auto max-w-lg py-4">
     <div className="text-center"><div className="mx-auto size-24 rounded-full bg-primary-soft flex items-center justify-center"><ShieldAlert className="text-primary" size={44} /></div><h2 className="mt-4 text-lg font-bold">{loading ? "Preparando seu pedido de ajuda…" : "SOS acionado"}</h2><p className="mt-2 text-sm text-muted-foreground">Em perigo imediato, ligue 190.</p><p className="mt-3 inline-flex items-center gap-2 text-xs"><MapPin size={16} className="text-primary" />{loading ? "Obtendo localização…" : location ? `Lat ${location.lat.toFixed(5)}, Lon ${location.lon.toFixed(5)}` : "Localização indisponível"}</p></div>
     <ul className="mt-6 space-y-3">
