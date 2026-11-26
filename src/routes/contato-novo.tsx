@@ -52,11 +52,16 @@ function NovoContato() {
       return;
     }
     try {
-      const result = await nav.contacts.select(["name", "tel"], { multiple: false });
-      const c = result?.[0];
-      if (!c) return;
-      if (c.name?.[0]) setName(c.name[0]);
-      if (c.tel?.[0]) setPhone(formatPhone(c.tel[0]));
+      const result = await nav.contacts.select(["name", "tel"], { multiple: true });
+      const selected = result.map((c) => ({ name: c.name?.[0] ?? "", phone: c.tel?.[0] ?? "" })).filter((c) => c.name || c.phone);
+      if (!selected.length) return;
+      if (selected.length === 1) {
+        setName(selected[0].name);
+        if (selected[0].phone) setPhone(formatPhone(selected[0].phone));
+      } else {
+        setImported(selected);
+        setPickerMsg(`${selected.length} contatos selecionados da agenda. Escolha qual deseja adicionar.`);
+      }
     } catch {
       setPickerMsg("A seleção foi cancelada ou não foi permitida. Tente importar um arquivo .vcf da agenda.");
     }
