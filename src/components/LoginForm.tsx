@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function LoginForm() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,8 +18,9 @@ export function LoginForm() {
   const social = async (provider: "google" | "lovable") => {
     setBusy(true); setNotice("");
     try {
-      const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
+      const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: `${window.location.origin}/inicio` });
       if (result.error) setNotice("Não foi possível entrar. Tente novamente.");
+      else if (!result.redirected) await navigate({ to: "/inicio", replace: true });
     } catch { setNotice("Não foi possível conectar. Tente novamente."); }
     finally { setBusy(false); }
   };
@@ -46,8 +49,10 @@ export function LoginForm() {
             setNotice("Cadastro recebido! Verifique sua caixa de entrada e o spam para confirmar seu e-mail. O link abrirá o aplicativo.");
           } else if (signup) {
             setNotice("Conta criada e acesso liberado com sucesso!");
+            await navigate({ to: "/inicio", replace: true });
           } else {
             setNotice("Login realizado com sucesso!");
+            await navigate({ to: "/inicio", replace: true });
           }
         }
       } catch { setNotice("Não foi possível conectar. Tente mais tarde."); }
