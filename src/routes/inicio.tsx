@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Users,
   MapPin,
@@ -16,6 +17,8 @@ import { pageHead } from "@/lib/page-head";
 import { useAppAuth } from "@/lib/auth-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTrustedContacts } from "@/lib/use-trusted-contacts";
+import { addAlert } from "@/lib/alerts";
 
 export const Route = createFileRoute("/inicio")({
   head: () =>
@@ -27,6 +30,18 @@ function Inicio() {
   const navigate = useNavigate();
   const { session } = useAppAuth();
   const cache = useQueryClient();
+  const { contacts, loading: contactsLoading } = useTrustedContacts();
+  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => setLocation({ lat: position.coords.latitude, lon: position.coords.longitude }),
+      () => setLocation(null),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
+    );
+  }, []);
+
   const tiles = [
     { to: "/contatos", icon: Users, label: "Contatos de\nConfiança" },
     { to: "/localizacao", icon: MapPin, label: "Localização\nem tempo real" },
@@ -37,7 +52,38 @@ function Inicio() {
   ] as const;
 
   const handleSos = () => {
-    navigate({ to: "/sos" });
+    const phones = [...new Set(
+      contacts
+        .map((contact) => contact.phone.replace(/\\D/g, ""))
+        .filter((phone) => phone.length >= 10),
+    )];
+
+    if (contactsLoading || phones.length === 0) {
+      navigate({ to: "/sos" });
+      return;
+    }
+
+    addAlert();
+    const locationText = location
+      ? `Minha localização atual: https://www.google.com/maps?q=${location.lat},${location.lon}`
+      : "Não foi possível obter minha localização pelo aparelho. Se puder, compartilhe sua localização manualmente.";
+    const message = [
+      "EMERGÊNCIA — CÓDIGO VIOLETA",
+      "Estou em perigo e preciso de ajuda imediata. Por favor, entre em contato comigo e acione ajuda se necessário.",
+      locationText,
+      "",
+      "CANAIS OFICIAIS DE APOIO (ligação):",
+      "190 — Polícia Militar (emergência).",
+      "180 — Central de Atendimento à Mulher.",
+      "197 — Polícia Civil.",
+      "100 — Direitos Humanos.",
+    ].join("\\n");
+
+    const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const recipients = phones.join(isApple ? ";" : ",");
+    const separator = isApple ? "&" : "?";
+    // O gesto do usuário abre diretamente o aplicativo de SMS; o envio é confirmado nele.
+    window.location.href = `sms:${recipients}${separator}body=${encodeURIComponent(message)}`;
   };
 
   return (
