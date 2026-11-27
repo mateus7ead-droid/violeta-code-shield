@@ -72,7 +72,6 @@ function Configuracoes() {
   const {
     save: saveContacts,
     loading: contactsLoading,
-    error: contactsError,
   } = useTrustedContacts();
   const [deleting, setDeleting] = useState(false);
   const [deleteNotice, setDeleteNotice] = useState("");
