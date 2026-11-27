@@ -45,7 +45,7 @@ function Sos() {
       <li className="bg-card border border-border rounded-lg p-4"><Button asChild variant="destructive" className="w-full"><a href="tel:190"><Phone />Ligar para a polícia — 190</a></Button></li>
       <li className="flex items-center gap-3 bg-card border border-border rounded-lg p-4 text-sm"><History className="text-primary" size={20} /><span className="flex-1">Acionamento registrado no histórico</span><Check className="text-primary" size={18} /></li>
     </ul>
-    <Button disabled={contactsLoading || !!contactsError || phones.length === 0} className="mt-5 w-full h-12" onClick={openEmergencySms}><Send />Abrir alerta novamente</Button>
+    <Button disabled={contactsLoading || !!contactsError || phones.length === 0} className="mt-5 w-full h-12" onClick={openEmergencySms}><Send />Abrir alerta por SMS</Button>
     {!contactsLoading && phones.length === 0 && <p className="mt-3 text-sm text-center text-muted-foreground">Nenhum contato salvo. Cadastre seus contatos de confiança.</p>}
     {notice && <p role="status" className="mt-4 text-sm text-primary">{notice}</p>}
     <p className="mt-4 text-xs text-muted-foreground text-center">Por segurança, o aplicativo de mensagens só é aberto quando você toca em “Abrir alerta”. Revise e confirme o envio. O Código Violeta não envia SMS em segundo plano nem confirma a entrega. O link mostra a localização obtida naquele momento.</p>
