@@ -40,3 +40,26 @@ export function applyAppIcon(id: AppIconId) {
   swap("icon");
   swap("apple-touch-icon");
 }
+
+
+/**
+ * O modo discreto altera somente o título e o favicon da aba.
+ * Navegadores não permitem trocar de forma confiável o ícone/nome
+ * de um PWA que já foi instalado.
+ */
+export function applyDiscreetMode(enabled: boolean) {
+  if (typeof document === "undefined") return;
+  if (enabled) {
+    document.title = "Calculadora";
+    const icon = APP_ICONS.calc.icon;
+    const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (favicon) favicon.href = icon;
+    const appleIcon = document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]');
+    if (appleIcon) appleIcon.href = icon;
+    const manifest = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    if (manifest) manifest.href = APP_ICONS.calc.manifest;
+    return;
+  }
+  document.title = "Código Violeta";
+  applyAppIcon(getSavedAppIcon());
+}
