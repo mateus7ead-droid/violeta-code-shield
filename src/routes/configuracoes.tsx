@@ -467,7 +467,7 @@ function Configuracoes() {
             </p>
             <ul className="list-disc pl-5 space-y-1 text-foreground/80">
               <li>Botão SOS rápido e discreto</li>
-              <li>Compartilhamento de localização em tempo real</li>
+              <li>Atualização de localização enquanto o app está aberto</li>
               <li>Histórico de acionamentos do SOS</li>
               <li>Ícone disfarçado para instalação</li>
             </ul>
@@ -485,11 +485,6 @@ function Configuracoes() {
     </PhoneShell>
   );
 }
-
-const TRIGGER_LABEL: Record<Exclude<SosTrigger, "off">, string> = {
-  volup: "Volume +",
-  voldown: "Volume −",
-};
 
 function DataDeleteRow({
   label,
