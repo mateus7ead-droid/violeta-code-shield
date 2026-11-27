@@ -355,8 +355,11 @@ function Configuracoes() {
               <Button
                 variant="ghost"
                 className="text-sos"
-                disabled={deleting || contactsLoading || !!contactsError}
-                onClick={() => void deleteContacts()}
+                disabled={deleting || contactsLoading}
+                onClick={() => {
+                if (!window.confirm("Excluir todos os contatos de confiança? Esta ação não pode ser desfeita.")) return;
+                void deleteContacts();
+              }}
               >
                 {deleting ? "Excluindo…" : "Excluir"}
               </Button>
@@ -452,23 +455,49 @@ const TRIGGER_LABEL: Record<Exclude<SosTrigger, "off">, string> = {
 function DataDeleteRow({
   label,
   storageKey,
+  confirmMessage,
   onAfter,
+  onSaved,
 }: {
   label: string;
   storageKey: string;
+  confirmMessage: string;
   onAfter?: () => void;
+  onSaved?: () => void;
 }) {
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+
   const handle = () => {
-    localStorage.removeItem(storageKey);
-    onAfter?.();
+    if (!window.confirm(confirmMessage)) return;
+    setDeleting(true);
+    setError("");
+    try {
+      localStorage.removeItem(storageKey);
+      onAfter?.();
+      onSaved?.();
+    } catch {
+      setError("Não foi possível excluir " + label.toLowerCase() + ". Tente novamente.");
+    } finally {
+      setDeleting(false);
+    }
   };
+
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border border-border">
-      <span className="text-sm text-foreground">{label}</span>
-      <button onClick={handle} className="text-xs text-sos font-semibold hover:underline">
-        Excluir
-      </button>
-    </div>
+    <>
+      <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
+        <span className="text-sm text-foreground">{label}</span>
+        <button
+          type="button"
+          onClick={handle}
+          disabled={deleting}
+          className="shrink-0 text-xs text-sos font-semibold hover:underline disabled:opacity-50"
+        >
+          {deleting ? "Excluindo…" : "Excluir"}
+        </button>
+      </div>
+      {error && <p role="alert" className="px-3 text-xs text-destructive">{error}</p>}
+    </>
   );
 }
 
