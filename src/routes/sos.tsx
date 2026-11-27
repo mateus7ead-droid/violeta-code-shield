@@ -12,7 +12,7 @@ function Sos() {
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const { contacts, loading: contactsLoading, error: contactsError } = useTrustedContacts();
-  const phones = contacts.map(contact => contact.phone.replace(/\D/g, "")).filter(phone => phone.length >= 10);
+  const phones = [...new Set(contacts.map(contact => contact.phone.replace(/\D/g, "")).filter(phone => phone.length >= 10))];
   const [taps, setTaps] = useState(0);
   const navigate = useNavigate();
   const alertId = useRef<string | null>(null);
@@ -28,9 +28,9 @@ function Sos() {
   }, []);
   const message = `EMERGÊNCIA — Código Violeta. Estou em perigo e preciso de ajuda imediata.${location ? ` Minha localização obtida agora: https://www.google.com/maps?q=${location.lat},${location.lon}` : " Não consegui obter minha localização."}`;
   useEffect(() => {
-    if (smsOpened.current || loading || contactsLoading || !location) return;
+    if (smsOpened.current || loading || contactsLoading) return;
     if (phones.length === 0) {
-      setNotice("Localização obtida, mas não há contatos de confiança com telefone válido. Cadastre um contato para receber o alerta.");
+      setNotice("Não há contatos de confiança com telefone válido. Cadastre um contato para que o SMS possa ser preparado.");
       return;
     }
     smsOpened.current = true;
@@ -38,7 +38,7 @@ function Sos() {
     const recipients = phones.join(isApple ? ";" : ",");
     const separator = isApple ? "&" : "?";
     window.location.href = `sms:${recipients}${separator}body=${encodeURIComponent(message)}`;
-    setNotice("Abrindo o aplicativo de SMS com sua localização e mensagem. Revise e confirme o envio.");
+    setNotice(location ? "Abrindo o aplicativo de SMS com sua localização e mensagem. Revise e confirme o envio." : "Não foi possível obter o GPS. Abrindo o SMS sem o link de localização; informe seu endereço, se puder.");
   }, [loading, contactsLoading, location, phones, message]);
 
   return <PhoneShell title="SOS — Pedir Ajuda" showBack><div className="mx-auto max-w-lg py-4">
@@ -51,7 +51,7 @@ function Sos() {
     </ul>
     {!contactsLoading && phones.length === 0 && <p className="mt-3 text-sm text-center text-muted-foreground">Nenhum contato salvo. Cadastre seus contatos de confiança.</p>}
     {notice && <p role="status" className="mt-4 text-sm text-primary">{notice}</p>}
-    <p className="mt-4 text-xs text-muted-foreground text-center">Assim que a localização for obtida e os contatos estiverem carregados, o aplicativo de SMS será aberto automaticamente. Revise a mensagem e confirme o envio. O Código Violeta não envia SMS em segundo plano nem confirma a entrega.</p>
+    <p className="mt-4 text-xs text-muted-foreground text-center">Assim que a tentativa de localização terminar e os contatos estiverem carregados, o aplicativo de SMS será aberto automaticamente. Revise a mensagem e confirme o envio. O Código Violeta não envia SMS em segundo plano nem confirma a entrega.</p>
     <Button variant="destructive" className="mt-7 w-full h-12 rounded-full" onClick={() => { const next = taps + 1; setTaps(next); if (next >= 5) { if (alertId.current) cancelAlert(alertId.current); void navigate({ to: "/inicio" }); } }}><BellOff />CANCELAR ALERTA</Button><p className="mt-2 text-center text-xs text-muted-foreground">Toque {Math.max(0, 5 - taps)} vezes para cancelar. Mensagens já enviadas não são desfeitas.</p>
   </div></PhoneShell>;
 }
