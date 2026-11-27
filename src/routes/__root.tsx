@@ -15,8 +15,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { addAlert } from "@/lib/alerts";
-import { applyAppIcon, getSavedAppIcon } from "@/lib/appIcon";
+import { applyAppIcon, applyDiscreetMode, getSavedAppIcon } from "@/lib/appIcon";
 
 function NotFoundComponent() {
   return (
@@ -149,12 +148,12 @@ function RootComponent() {
   useEffect(() => {
     // Ícone instalado sem cache offline ou registro de service worker.
     applyAppIcon(getSavedAppIcon());
+    applyDiscreetMode(localStorage.getItem("cv:discreet") === "true");
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={auth}>
-      <DiscreetSosListener />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       </AuthContext.Provider>
@@ -162,39 +161,3 @@ function RootComponent() {
   );
 }
 
-function DiscreetSosListener() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const STORAGE_KEY = "cv:sosTrigger";
-    const keyMap = {
-      volup: ["AudioVolumeUp", "VolumeUp"],
-      voldown: ["AudioVolumeDown", "VolumeDown"],
-    } as const;
-
-    let presses: number[] = [];
-
-    const onKey = (event: KeyboardEvent) => {
-      const trigger = localStorage.getItem(STORAGE_KEY) as keyof typeof keyMap | "off" | null;
-      if (!trigger || trigger === "off") return;
-
-      const validKeys = keyMap[trigger];
-      if (!validKeys?.includes(event.key as never)) return;
-
-      event.preventDefault();
-      const now = Date.now();
-      presses = presses.filter((time) => now - time < 2000);
-      presses.push(now);
-
-      if (presses.length >= 3) {
-        presses = [];
-        navigate({ to: "/sos" });
-      }
-    };
-
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [navigate]);
-
-  return null;
-}
