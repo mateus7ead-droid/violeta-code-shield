@@ -124,9 +124,6 @@ function Localizacao() {
           className="absolute inset-0 w-full h-full border-0"
           loading="lazy"
         />
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-card shadow-md rounded-lg px-4 py-2 text-xs text-center text-foreground/80 w-64 z-10">
-          A localização atualiza com o app aberto; em segundo plano, o rastreamento é pausado
-        </div>
       </div>
       <div className="bg-card p-5 rounded-t-2xl -mt-4 relative shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.1)] z-10">
         <h3 className="font-bold text-foreground flex items-center gap-2">
