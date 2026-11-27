@@ -2,10 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Plus, Save, Trash2, UserRound, Users, Camera, CheckCircle2 } from "lucide-react";
+import { MapPin, Plus, Save, Trash2, UserRound, Users, Camera, CheckCircle2, X } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useAppAuth } from "@/lib/auth-context";
 import { getProfile, saveProfile } from "@/lib/profile.functions";
 import {
@@ -32,6 +33,8 @@ function Profile() {
   const key = ["profile", session?.user.id];
   const query = useQuery({ queryKey: key, queryFn: () => load(), enabled: ready && !!session });
   const [name, setName] = useState("");
+  const [savedName, setSavedName] = useState("");
+  const [photoOpen, setPhotoOpen] = useState(false);
   const [address, setAddress] = useState("");
   const [contacts, setContacts] = useState<TrustedContact[]>([]);
   const [notice, setNotice] = useState("");
@@ -70,6 +73,7 @@ function Profile() {
   useEffect(() => {
     if (query.data && !dirty) {
       setName(query.data.name);
+      setSavedName(query.data.name);
       setAddress(query.data.address);
       setContacts(query.data.contacts);
     }
@@ -86,6 +90,8 @@ function Profile() {
     try {
       const profile = await save({ data: result.data });
       cache.setQueryData(key, profile);
+      setName(profile.name);
+      setSavedName(profile.name);
       setDirty(false);
       setNotice("Perfil salvo com sucesso.");
     } catch {
@@ -103,13 +109,42 @@ function Profile() {
   return (
     <PhoneShell title="Meu Perfil" showBack>
       <div className="mx-auto max-w-lg">
+      <Dialog open={photoOpen} onOpenChange={setPhotoOpen}>
+        <DialogContent className="max-w-lg border-0 bg-black p-2 text-white">
+          <div className="flex items-center justify-between px-2 py-1">
+            <DialogTitle className="text-sm font-semibold text-white">Foto de perfil</DialogTitle>
+            <button type="button" onClick={() => setPhotoOpen(false)} aria-label="Fechar visualização da foto" className="rounded-full p-2 hover:bg-white/10">
+              <X size={20} />
+            </button>
+          </div>
+          {avatar && (
+            <img src={avatar} alt="Foto de perfil ampliada" className="mx-auto max-h-[75vh] w-full rounded-md object-contain" />
+          )}
+          <Button type="button" variant="secondary" className="w-full" onClick={() => { setPhotoOpen(false); avatarInput.current?.click(); }}>
+            <Camera /> Alterar foto
+          </Button>
+        </DialogContent>
+      </Dialog>
         <div className="flex items-center gap-4 border-b border-border pb-5 mb-6">
           <div className="relative shrink-0">
-            <button type="button" onClick={() => avatarInput.current?.click()} aria-label="Adicionar ou alterar foto de perfil"
-              className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-primary-soft text-primary">
-              {avatar ? <img src={avatar} alt="Foto de perfil" className="h-full w-full object-cover" /> : <UserRound size={38} />}
-              <span className="absolute bottom-0 right-0 rounded-full bg-primary p-1 text-primary-foreground"><Camera size={14} /></span>
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => avatar ? setPhotoOpen(true) : avatarInput.current?.click()}
+                aria-label={avatar ? "Visualizar foto de perfil em tamanho completo" : "Adicionar foto de perfil"}
+                className="relative flex size-20 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-primary-soft text-primary"
+              >
+                {avatar ? <img src={avatar} alt="Foto de perfil" className="h-full w-full object-cover" /> : <UserRound size={38} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => avatarInput.current?.click()}
+                aria-label="Alterar foto de perfil"
+                className="absolute bottom-0 right-0 rounded-full bg-primary p-1.5 text-primary-foreground shadow"
+              >
+                <Camera size={14} />
+              </button>
+            </div>
             <input ref={avatarInput} type="file" accept="image/*" className="hidden" onChange={(event) => {
               const file = event.target.files?.[0];
               event.currentTarget.value = "";
@@ -142,7 +177,7 @@ function Profile() {
             }} />
           </div>
           <div className="min-w-0">
-            <h2 className="font-bold text-xl">Minha conta</h2>
+            <h2 className="font-bold text-xl">{savedName.trim() || "Minha conta"}</h2>
             <p className="text-sm text-muted-foreground break-all">{session?.user.email}</p>
             <button type="button" onClick={() => avatarInput.current?.click()} className="mt-1 text-xs font-semibold text-primary underline">Adicionar ou alterar foto</button>
             {avatarNotice && <p role="status" className={`mt-1 text-xs font-semibold ${avatarNotice.includes("sucesso") ? "text-green-700" : "text-destructive"}`}>{avatarNotice}</p>}
