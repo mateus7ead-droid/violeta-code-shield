@@ -29,6 +29,7 @@ import {
   APP_ICON_KEY,
   APP_ICONS,
   applyAppIcon,
+  applyDiscreetMode,
   getSavedAppIcon,
   type AppIconId,
 } from "@/lib/appIcon";
@@ -96,6 +97,9 @@ function Configuracoes() {
 
   useEffect(() => {
     setSelectedIcon(getSavedAppIcon());
+    const discreetEnabled = localStorage.getItem("cv:discreet") === "true";
+    setDiscreto(discreetEnabled);
+    applyDiscreetMode(discreetEnabled);
     setHasPin(!!localStorage.getItem("cv:pin"));
     const t = (localStorage.getItem(SOS_TRIGGER_KEY) as SosTrigger) || "off";
     setSosTrigger(t);
@@ -153,10 +157,18 @@ function Configuracoes() {
         <Row
           icon={BellOff}
           title="Modo discreto"
-          sub="Oculta notificações e ícone do app"
+          sub="Disfarça o título e o ícone da aba do navegador"
           right={
             <button
-              onClick={() => setDiscreto((v) => !v)}
+              onClick={() => {
+                const next = !discreto;
+                setDiscreto(next);
+                localStorage.setItem("cv:discreet", String(next));
+                applyDiscreetMode(next);
+                setSaveNotice(next
+                  ? "Modo discreto ativado nesta aba. O ícone do app já instalado pode não mudar."
+                  : "Modo discreto desativado.");
+              }}
               aria-label="Alternar modo discreto"
               className={`w-11 h-6 rounded-full transition-colors ${
                 discreto ? "bg-primary" : "bg-muted-foreground/30"
@@ -197,7 +209,7 @@ function Configuracoes() {
           <Row
             icon={Zap}
             title="Botão de SOS discreto"
-            sub={sosTrigger === "off" ? "Desativado" : `Ativo: 3x ${TRIGGER_LABEL[sosTrigger]}`}
+            sub="Botões físicos de volume não são detectáveis de forma confiável na web"
           />
         </button>
         <button onClick={() => setDeleteOpen(true)} className="w-full text-left">
@@ -305,15 +317,10 @@ function Configuracoes() {
           <DialogHeader>
             <DialogTitle>Botão de SOS discreto</DialogTitle>
             <DialogDescription>
-              Aperte 3 vezes seguidas o botão escolhido quando o aplicativo estiver aberto e o
-              navegador permitir detectar esses botões.
+              O navegador não oferece acesso confiável aos botões físicos de volume. Por segurança, esse atalho não pode ser garantido e não deve ser usado como único meio de pedir ajuda.
             </DialogDescription>
           </DialogHeader>
-          <RadioGroup
-            value={sosTrigger}
-            onValueChange={(v) => saveSosTrigger(v as SosTrigger)}
-            className="pt-2"
-          >
+          <RadioGroup value="off" disabled className="pt-2">
             {(
               [
                 ["off", "Desativado"],
@@ -331,8 +338,7 @@ function Configuracoes() {
             ))}
           </RadioGroup>
           <p className="text-xs text-muted-foreground">
-            Não funciona com o aplicativo fechado ou a tela bloqueada. O SOS abre as opções de
-            ajuda; mensagens precisam de confirmação.
+            Atalho por volume indisponível nesta versão web. Use o botão SOS na tela ou ligue diretamente para 190.
           </p>
           <DialogFooter>
             <Button onClick={() => setSosOpen(false)}>Concluir</Button>
