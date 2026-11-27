@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Plus, Save, Trash2, UserRound, Users, Camera, CheckCircle2, X } from "lucide-react";
+import { MapPin, Plus, Save, Trash2, UserRound, Users, Camera, CheckCircle2 } from "lucide-react";
 import { PhoneShell } from "@/components/PhoneShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,9 +113,6 @@ function Profile() {
         <DialogContent className="max-w-lg border-0 bg-black p-2 text-white">
           <div className="flex items-center justify-between px-2 py-1">
             <DialogTitle className="text-sm font-semibold text-white">Foto de perfil</DialogTitle>
-            <button type="button" onClick={() => setPhotoOpen(false)} aria-label="Fechar visualização da foto" className="rounded-full p-2 hover:bg-white/10">
-              <X size={20} />
-            </button>
           </div>
           {avatar && (
             <img src={avatar} alt="Foto de perfil ampliada" className="mx-auto max-h-[75vh] w-full rounded-md object-contain" />
