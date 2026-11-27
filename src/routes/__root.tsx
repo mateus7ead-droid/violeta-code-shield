@@ -145,10 +145,10 @@ function RootComponent() {
   }, [queryClient, router]);
 
   useEffect(() => {
-    // Ícone instalado sem cache offline ou registro de service worker.
+    // Mantém o disfarce também quando a navegação altera o título da página.
     applyAppIcon(getSavedAppIcon());
     applyDiscreetMode(localStorage.getItem("cv:discreet") === "true");
-  }, []);
+  }, [router.state.location.pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
