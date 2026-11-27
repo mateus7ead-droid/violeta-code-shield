@@ -47,11 +47,13 @@ export const deleteThread = createServerFn({ method: "POST" })
 export const deleteAllThreads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // Exclui primeiro as mensagens e depois os títulos das conversas,
-    // sempre limitando a operação ao usuário autenticado.
-    const messages = await context.supabase.from("ai_messages").delete().eq("user_id", context.userId);
-    if (messages.error) throw new Error("Não foi possível excluir as mensagens da assistente.");
-    const threads = await context.supabase.from("ai_threads").delete().eq("user_id", context.userId);
-    if (threads.error) throw new Error("As mensagens foram excluídas, mas não foi possível excluir a lista de conversas.");
+    // A chave estrangeira ai_messages.thread_id usa ON DELETE CASCADE.
+    // Uma única exclusão dos tópicos remove mensagens e conversas atomicamente,
+    // sempre limitada ao usuário autenticado.
+    const { error } = await context.supabase
+      .from("ai_threads")
+      .delete()
+      .eq("user_id", context.userId);
+    if (error) throw new Error("Não foi possível excluir as conversas e mensagens da assistente.");
     return { ok: true };
   });
