@@ -52,25 +52,51 @@ function Localizacao() {
       setStatus("Geolocalização não suportada neste dispositivo.");
       return;
     }
-    setLoading(true);
-    watchId.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        setCoords({
-          lat: Number(pos.coords.latitude.toFixed(4)),
-          lon: Number(pos.coords.longitude.toFixed(4)),
-          label: "Sua localização atual (em tempo real)",
-        });
+
+    const stopWatching = () => {
+      if (watchId.current !== null) {
+        navigator.geolocation.clearWatch(watchId.current);
+        watchId.current = null;
+      }
+    };
+
+    const startWatching = () => {
+      stopWatching();
+      if (document.visibilityState !== "visible") return;
+      setLoading(true);
+      watchId.current = navigator.geolocation.watchPosition(
+        (pos) => {
+          setCoords({
+            lat: Number(pos.coords.latitude.toFixed(4)),
+            lon: Number(pos.coords.longitude.toFixed(4)),
+            label: "Última localização recebida enquanto o app estava aberto",
+          });
+          setLoading(false);
+          setStatus(null);
+        },
+        (err) => {
+          setStatus(err.message || "Não foi possível obter a localização.");
+          setLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        stopWatching();
+        setStatus("Rastreamento pausado: o navegador suspende a localização em segundo plano. Ao voltar ao app, a atualização será retomada.");
         setLoading(false);
-        setStatus(null);
-      },
-      (err) => {
-        setStatus(err.message || "Não foi possível obter a localização.");
-        setLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+      } else {
+        startWatching();
+      }
+    };
+
+    startWatching();
+    document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
-      if (watchId.current !== null) navigator.geolocation.clearWatch(watchId.current);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      stopWatching();
     };
   }, []);
 
@@ -99,7 +125,7 @@ function Localizacao() {
           loading="lazy"
         />
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-card shadow-md rounded-lg px-4 py-2 text-xs text-center text-foreground/80 w-64 z-10">
-          Sua localização não é enviada automaticamente
+          A localização atualiza com o app aberto; em segundo plano, o rastreamento é pausado
         </div>
       </div>
       <div className="bg-card p-5 rounded-t-2xl -mt-4 relative shadow-[0_-4px_20px_-8px_rgba(0,0,0,0.1)] z-10">
