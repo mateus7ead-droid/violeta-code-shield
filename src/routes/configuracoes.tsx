@@ -349,43 +349,87 @@ function Configuracoes() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
-              <span className="text-sm">Contatos de confiança</span>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground">Contatos de confiança</p>
+                <p className="text-xs text-muted-foreground">Apaga os contatos vinculados à sua conta e salvos neste aparelho.</p>
+              </div>
               <Button
                 variant="ghost"
-                className="text-sos"
+                className="h-8 shrink-0 px-2 text-xs text-sos"
                 disabled={deleting || contactsLoading}
                 onClick={() => {
-                if (!window.confirm("Excluir todos os contatos de confiança? Esta ação não pode ser desfeita.")) return;
-                void deleteContacts();
-              }}
+                  if (!window.confirm("Excluir todos os contatos de confiança? Esta ação não pode ser desfeita.")) return;
+                  void deleteContacts();
+                }}
               >
                 {deleting ? "Excluindo…" : "Excluir"}
               </Button>
             </div>
-            <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
-              <div className="min-w-0"><p className="text-sm font-medium">Meu Diário de Desabafo</p><p className="text-xs text-muted-foreground">Apaga textos e fotos salvos neste aparelho.</p></div>
-              <Button variant="ghost" className="shrink-0 text-sos" disabled={deletingDiary} onClick={() => {
-                if (!window.confirm("Excluir todos os desabafos e fotos do seu diário? Esta ação não pode ser desfeita.")) return;
-                setDeletingDiary(true);
-                try { localStorage.removeItem("cv:diario"); setDeleteNotice("Diário de Desabafo excluído com sucesso."); }
-                catch { setDeleteNotice("Não foi possível excluir o diário."); }
-                finally { setDeletingDiary(false); }
-              }}>{deletingDiary ? "Excluindo…" : "Excluir"}</Button>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground">Meu Diário de Desabafo</p>
+                <p className="text-xs text-muted-foreground">Apaga textos e fotos salvos neste aparelho.</p>
+              </div>
+              <Button
+                variant="ghost"
+                className="h-8 shrink-0 px-2 text-xs text-sos"
+                disabled={deletingDiary}
+                onClick={() => {
+                  if (!window.confirm("Excluir todos os desabafos e fotos do seu diário? Esta ação não pode ser desfeita.")) return;
+                  setDeletingDiary(true);
+                  setDeleteNotice("");
+                  try {
+                    localStorage.removeItem("cv:diario");
+                    setDeleteNotice("Diário de Desabafo excluído com sucesso.");
+                  } catch {
+                    setDeleteNotice("Não foi possível excluir o diário.");
+                  } finally {
+                    setDeletingDiary(false);
+                  }
+                }}
+              >
+                {deletingDiary ? "Excluindo…" : "Excluir"}
+              </Button>
             </div>
-            <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
-              <div className="min-w-0"><p className="text-sm font-medium">Conversas com Maria da Penha</p><p className="text-xs text-muted-foreground">Apaga todas as conversas e mensagens da sua conta.</p></div>
-              <Button variant="ghost" className="shrink-0 text-sos" disabled={deletingConversations} onClick={async () => {
-                if (!window.confirm("Excluir todas as conversas e mensagens com Maria da Penha da sua conta? Esta ação não pode ser desfeita.")) return;
-                setDeletingConversations(true); setDeleteNotice("");
-                try { await deleteConversations(); await cache.invalidateQueries({ queryKey: ["assistant-threads"] }); await cache.removeQueries({ queryKey: ["assistant-thread"] }); setDeleteNotice("Conversas com Maria da Penha excluídas com sucesso."); }
-                catch { setDeleteNotice("Não foi possível excluir as conversas. Tente novamente."); }
-                finally { setDeletingConversations(false); }
-              }}>{deletingConversations ? "Excluindo…" : "Excluir"}</Button>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground">Conversas com Maria da Penha</p>
+                <p className="text-xs text-muted-foreground">Apaga todas as conversas e mensagens da sua conta.</p>
+              </div>
+              <Button
+                variant="ghost"
+                className="h-8 shrink-0 px-2 text-xs text-sos"
+                disabled={deletingConversations}
+                onClick={async () => {
+                  if (!window.confirm("Excluir todas as conversas e mensagens com Maria da Penha da sua conta? Esta ação não pode ser desfeita.")) return;
+                  setDeletingConversations(true);
+                  setDeleteNotice("");
+                  try {
+                    await deleteConversations();
+                    await cache.invalidateQueries({ queryKey: ["assistant-threads"] });
+                    await cache.removeQueries({ queryKey: ["assistant-thread"] });
+                    setDeleteNotice("Conversas com Maria da Penha excluídas com sucesso.");
+                  } catch {
+                    setDeleteNotice("Não foi possível excluir as conversas. Tente novamente.");
+                  } finally {
+                    setDeletingConversations(false);
+                  }
+                }}
+              >
+                {deletingConversations ? "Excluindo…" : "Excluir"}
+              </Button>
             </div>
-            <DataDeleteRow label="Histórico de alertas" storageKey="cv:alerts" confirmMessage="Excluir todo o histórico de alertas? Esta ação não pode ser desfeita." onSaved={() => setDeleteNotice("Histórico de alertas excluído com sucesso.")} />
+            <DataDeleteRow
+              label="Histórico de alertas"
+              description="Apaga os registros de acionamentos do SOS salvos neste aparelho."
+              storageKey="cv:alerts"
+              confirmMessage="Excluir todo o histórico de alertas? Esta ação não pode ser desfeita."
+              onSaved={() => setDeleteNotice("Histórico de alertas excluído com sucesso.")}
+            />
             <DataDeleteRow
               label="PIN de segurança"
+              description="Remove o PIN de bloqueio salvo neste aparelho."
               storageKey="cv:pin"
               confirmMessage="Excluir o PIN de segurança salvo neste aparelho? Esta ação não pode ser desfeita."
               onAfter={() => setHasPin(false)}
@@ -453,12 +497,14 @@ const TRIGGER_LABEL: Record<Exclude<SosTrigger, "off">, string> = {
 
 function DataDeleteRow({
   label,
+  description,
   storageKey,
   confirmMessage,
   onAfter,
   onSaved,
 }: {
   label: string;
+  description: string;
   storageKey: string;
   confirmMessage: string;
   onAfter?: () => void;
@@ -485,12 +531,15 @@ function DataDeleteRow({
   return (
     <>
       <div className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border">
-        <span className="text-sm text-foreground">{label}</span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground">{label}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
+        </div>
         <button
           type="button"
           onClick={handle}
           disabled={deleting}
-          className="shrink-0 text-xs text-sos font-semibold hover:underline disabled:opacity-50"
+          className="h-8 shrink-0 px-2 text-xs text-sos font-semibold hover:underline disabled:opacity-50"
         >
           {deleting ? "Excluindo…" : "Excluir"}
         </button>
