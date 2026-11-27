@@ -12,8 +12,29 @@ export const saveProfile = createServerFn({ method: "POST" }).middleware([requir
   if (error) throw new Error("Não foi possível salvar seu perfil.");
   return data;
 });
-export const saveContacts = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input: unknown) => contactsSchema.parse(input)).handler(async ({ context, data }) => {
-  const { error } = await context.supabase.from("profiles").upsert({ id: context.userId, contacts: data });
-  if (error) throw new Error("Não foi possível salvar seus contatos.");
-  return data;
-});
+export const saveContacts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => contactsSchema.parse(input))
+  .handler(async ({ context, data }) => {
+    // Atualiza somente os contatos para preservar nome e endereço já salvos.
+    const updated = await context.supabase
+      .from("profiles")
+      .update({ contacts: data })
+      .eq("id", context.userId)
+      .select("id")
+      .maybeSingle();
+
+    if (updated.error) throw new Error("Não foi possível salvar seus contatos.");
+
+    // Cria o perfil mínimo apenas quando ainda não existe um registro.
+    if (!updated.data) {
+      const inserted = await context.supabase
+        .from("profiles")
+        .insert({ id: context.userId, contacts: data })
+        .select("id")
+        .single();
+      if (inserted.error) throw new Error("Não foi possível salvar seus contatos.");
+    }
+
+    return data;
+  });
