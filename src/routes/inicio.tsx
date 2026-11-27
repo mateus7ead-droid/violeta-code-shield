@@ -18,7 +18,6 @@ import { useAppAuth } from "@/lib/auth-context";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTrustedContacts } from "@/lib/use-trusted-contacts";
-import { addAlert } from "@/lib/alerts";
 
 export const Route = createFileRoute("/inicio")({
   head: () =>
@@ -58,38 +57,8 @@ function Inicio() {
   ] as const;
 
   const handleSos = () => {
-    const phones = [...new Set(
-      contacts
-        .map((contact) => contact.phone.replace(/\D/g, ""))
-        .filter((phone) => phone.length >= 10),
-    )];
-
-    if (contactsLoading || phones.length === 0) {
-      navigate({ to: "/sos" });
-      return;
-    }
-
-    addAlert();
-    const locationText = location
-      ? `Minha localização GPS: https://www.google.com/maps?q=${location.lat.toFixed(6)},${location.lon.toFixed(6)} (precisão estimada pelo aparelho: ±${Math.round(location.accuracy)} metros).`
-      : "A localização GPS ainda não foi obtida. Compartilhe sua localização pelo aparelho, se possível.";
-    const message = [
-      "EMERGÊNCIA — CÓDIGO VIOLETA",
-      "Estou em perigo e preciso de ajuda imediata. Por favor, entre em contato comigo e acione ajuda se necessário.",
-      locationText,
-      "",
-      "CANAIS OFICIAIS DE APOIO (ligação):",
-      "190 — Polícia Militar (emergência).",
-      "180 — Central de Atendimento à Mulher.",
-      "197 — Polícia Civil.",
-      "100 — Direitos Humanos.",
-    ].join("\n");
-
-    const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const recipients = phones.join(isApple ? ";" : ",");
-    const separator = isApple ? "&" : "?";
-    // O gesto do usuário abre diretamente o aplicativo de SMS; o envio é confirmado nele.
-    window.location.href = `sms:${recipients}${separator}body=${encodeURIComponent(message)}`;
+    // Exibe primeiro a tela de preparação, permitindo cancelar antes de abrir o SMS.
+    void navigate({ to: "/sos" });
   };
 
   return (
