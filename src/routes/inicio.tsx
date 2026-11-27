@@ -54,7 +54,7 @@ function Inicio() {
   const handleSos = () => {
     const phones = [...new Set(
       contacts
-        .map((contact) => contact.phone.replace(/\\D/g, ""))
+        .map((contact) => contact.phone.replace(/\D/g, ""))
         .filter((phone) => phone.length >= 10),
     )];
 
@@ -77,7 +77,7 @@ function Inicio() {
       "180 — Central de Atendimento à Mulher.",
       "197 — Polícia Civil.",
       "100 — Direitos Humanos.",
-    ].join("\\n");
+    ].join("\n");
 
     const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const recipients = phones.join(isApple ? ";" : ",");
