@@ -54,7 +54,7 @@ const ICON_OPTIONS: IconOption[] = (Object.keys(APP_ICONS) as AppIconId[]).map((
 }));
 
 function Configuracoes() {
-  const [discreto, setDiscreto] = useState(true);
+  const [discreto, setDiscreto] = useState(false);
   const [iconOpen, setIconOpen] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<AppIconId>("violeta");
   const [pinOpen, setPinOpen] = useState(false);
@@ -105,6 +105,7 @@ function Configuracoes() {
     setSelectedIcon(id);
     localStorage.setItem(APP_ICON_KEY, id);
     applyAppIcon(id);
+    if (discreto) applyDiscreetMode(true);
     setIconOpen(false);
     setSaveNotice("Ícone salvo com sucesso.");
   };
