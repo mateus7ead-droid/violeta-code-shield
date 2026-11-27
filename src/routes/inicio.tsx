@@ -31,15 +31,21 @@ function Inicio() {
   const { session } = useAppAuth();
   const cache = useQueryClient();
   const { contacts, loading: contactsLoading } = useTrustedContacts();
-  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lon: number; accuracy: number } | null>(null);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (position) => setLocation({ lat: position.coords.latitude, lon: position.coords.longitude }),
+    // Mantém a posição atualizada enquanto a tela inicial está aberta e solicita GPS de alta precisão.
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => setLocation({
+        lat: position.coords.latitude,
+        lon: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+      }),
       () => setLocation(null),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
     );
+    return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
   const tiles = [
@@ -65,8 +71,8 @@ function Inicio() {
 
     addAlert();
     const locationText = location
-      ? `Minha localização atual: https://www.google.com/maps?q=${location.lat},${location.lon}`
-      : "Não foi possível obter minha localização pelo aparelho. Se puder, compartilhe sua localização manualmente.";
+      ? `Minha localização GPS: https://www.google.com/maps?q=${location.lat.toFixed(6)},${location.lon.toFixed(6)} (precisão estimada pelo aparelho: ±${Math.round(location.accuracy)} metros).`
+      : "A localização GPS ainda não foi obtida. Compartilhe sua localização pelo aparelho, se possível.";
     const message = [
       "EMERGÊNCIA — CÓDIGO VIOLETA",
       "Estou em perigo e preciso de ajuda imediata. Por favor, entre em contato comigo e acione ajuda se necessário.",
