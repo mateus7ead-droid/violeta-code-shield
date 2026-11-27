@@ -24,7 +24,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SOS_TRIGGER_KEY, type SosTrigger } from "@/lib/useDiscreetSos";
 import {
   APP_ICON_KEY,
   APP_ICONS,
@@ -64,7 +63,6 @@ function Configuracoes() {
   const [pinConfirm, setPinConfirm] = useState("");
   const [pinError, setPinError] = useState("");
   const [sosOpen, setSosOpen] = useState(false);
-  const [sosTrigger, setSosTrigger] = useState<SosTrigger>("off");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [saveNotice, setSaveNotice] = useState("");
@@ -101,15 +99,7 @@ function Configuracoes() {
     setDiscreto(discreetEnabled);
     applyDiscreetMode(discreetEnabled);
     setHasPin(!!localStorage.getItem("cv:pin"));
-    const t = (localStorage.getItem(SOS_TRIGGER_KEY) as SosTrigger) || "off";
-    setSosTrigger(t);
   }, []);
-
-  const saveSosTrigger = (t: SosTrigger) => {
-    setSosTrigger(t);
-    localStorage.setItem(SOS_TRIGGER_KEY, t);
-    setSaveNotice("Preferência salva com sucesso.");
-  };
 
   const pickIcon = (id: AppIconId) => {
     setSelectedIcon(id);
@@ -157,7 +147,7 @@ function Configuracoes() {
         <Row
           icon={BellOff}
           title="Modo discreto"
-          sub="Disfarça o título e o ícone da aba do navegador"
+          sub="Disfarça título e ícone da aba; não altera notificações do sistema"
           right={
             <button
               onClick={() => {
