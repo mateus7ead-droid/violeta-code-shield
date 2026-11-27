@@ -60,6 +60,6 @@ export function applyDiscreetMode(enabled: boolean) {
     if (manifest) manifest.href = APP_ICONS.calc.manifest;
     return;
   }
-  document.title = "Código Violeta";
+  document.title = APP_ICONS[getSavedAppIcon()].label;
   applyAppIcon(getSavedAppIcon());
 }
